@@ -21,88 +21,110 @@
   --shadow: 0 2px 8px rgba(27,43,75,0.08);
 }
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
-.wrap{max-width:1100px;margin:0 auto;padding:24px}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.5;-webkit-text-size-adjust:100%}
+.wrap{max-width:1100px;margin:0 auto;padding:16px}
 
-.hero{background:linear-gradient(135deg,var(--primary),#1c3352);color:var(--white);border-radius:var(--radius);padding:32px 36px;margin-bottom:24px}
-.hero h1{font-size:26px;font-weight:700}
-.hero p{color:#b8c4d4;font-size:14px;margin-top:6px}
-.hero .tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:8px}
+.hero{background:linear-gradient(135deg,var(--primary),#1c3352);color:var(--white);border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.hero h1{font-size:20px;font-weight:700}
+.hero p{color:#b8c4d4;font-size:13px;margin-top:4px}
+.hero .tag{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:6px}
+.hero .links{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12px}
 
-.section-title{font-size:18px;font-weight:700;color:var(--primary);margin:28px 0 14px;display:flex;align-items:center;gap:10px}
-.section-title .badge{font-size:11px;background:var(--primary);color:var(--accent);padding:3px 10px;border-radius:20px;font-weight:700}
+.section-title{font-size:16px;font-weight:700;color:var(--primary);margin:20px 0 10px;display:flex;align-items:center;gap:8px}
+.section-title .badge{font-size:10px;background:var(--primary);color:var(--accent);padding:2px 8px;border-radius:20px;font-weight:700;white-space:nowrap}
 
 /* VEREDITO */
-.veredito{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 28px;text-align:center;margin-bottom:24px;border-top:4px solid var(--frio)}
+.veredito{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;text-align:center;margin-bottom:16px;border-top:4px solid var(--frio)}
 .veredito.ready{border-top-color:var(--quente)}
-.veredito .icon{font-size:42px;margin-bottom:8px}
-.veredito h2{font-size:20px;font-weight:700;color:var(--text)}
-.veredito p{font-size:14px;color:#5c6675;max-width:600px;margin:6px auto 0}
-.veredito .progress-container{max-width:500px;margin:16px auto 0}
-.veredito .progress-bar{height:8px;background:#eee;border-radius:10px;overflow:hidden}
+.veredito .icon{font-size:32px;margin-bottom:4px}
+.veredito h2{font-size:17px;font-weight:700;color:var(--text)}
+.veredito p{font-size:13px;color:#5c6675;margin:4px auto 0}
+.veredito .progress-container{margin:12px auto 0}
+.veredito .progress-bar{height:6px;background:#eee;border-radius:10px;overflow:hidden}
 .veredito .progress-fill{height:100%;border-radius:10px;transition:width 0.5s ease}
-.veredito .progress-label{font-size:12px;color:#5c6675;margin-top:6px}
+.veredito .progress-label{font-size:11px;color:#5c6675;margin-top:4px}
 
 /* METRICAS */
-.metricas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
-.metrica-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;border-left:4px solid var(--frio)}
+.metricas-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:16px}
+.metrica-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;border-left:4px solid var(--frio)}
 .metrica-card.ok{border-left-color:var(--quente)}
 .metrica-card.warn{border-left-color:var(--morno)}
-.metrica-card h3{font-size:13px;font-weight:600;color:#5c6675;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px}
-.metrica-card .valor{font-size:28px;font-weight:800;color:var(--text)}
-.metrica-card .meta{font-size:12px;color:#5c6675;margin-top:4px}
-.metrica-card .status{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-top:6px}
+.metrica-card h3{font-size:11px;font-weight:600;color:#5c6675;text-transform:uppercase;letter-spacing:0.3px;margin-bottom:2px}
+.metrica-card .valor{font-size:22px;font-weight:800;color:var(--text)}
+.metrica-card .meta{font-size:11px;color:#5c6675;margin-top:2px}
+.metrica-card .status{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px}
 .status.ok{background:rgba(30,132,73,0.12);color:var(--quente)}
 .status.warn{background:rgba(214,137,16,0.12);color:var(--morno)}
 .status.fail{background:rgba(192,57,43,0.12);color:#c0392b}
 
 /* HISTORICO / FORM */
-.form-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:24px}
-.form-card h3{font-size:16px;font-weight:700;color:var(--primary);margin-bottom:14px}
-.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
-.form-group label{display:block;font-size:12px;font-weight:600;color:#5c6675;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px}
-.form-group input{width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border 0.2s}
+.form-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+.form-card h3{font-size:14px;font-weight:700;color:var(--primary);margin-bottom:10px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.form-group label{display:block;font-size:10px;font-weight:600;color:#5c6675;margin-bottom:2px;text-transform:uppercase;letter-spacing:0.2px}
+.form-group input{width:100%;padding:8px 10px;border:1.5px solid #ddd;border-radius:6px;font-size:14px;font-family:inherit;outline:none;transition:border 0.2s;min-height:38px}
 .form-group input:focus{border-color:var(--accent)}
-.form-row-btn{display:flex;gap:10px}
-.form-row-btn button{padding:11px 24px;border:none;border-radius:var(--radius);font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.form-row-btn{display:flex;gap:8px;flex-wrap:wrap}
+.form-row-btn button{padding:10px 18px;border:none;border-radius:var(--radius);font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;transition:all 0.2s;flex:1;min-width:100px}
 .btn-add{background:var(--accent);color:var(--primary)}
-.btn-add:hover{background:#c08e10}
+.btn-add:active{background:#c08e10}
 .btn-reset{background:#eee;color:#5c6675}
-.btn-reset:hover{background:#ddd}
+.btn-reset:active{background:#ddd}
 
-/* TABELA */
-.table-section{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto;margin-bottom:24px}
-table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
-thead th{background:var(--primary);color:var(--white);text-align:left;padding:10px 14px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.3px}
-tbody td{padding:10px 14px;border-bottom:1px solid #f0f0f0}
-tbody tr:hover{background:#f8f9fb}
-tbody tr:last-child td{border:none}
+/* TABELA — mobile cards */
+.table-section{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead{display:none}
+tbody td{padding:6px 10px;border-bottom:1px solid #f0f0f0;display:block;text-align:right;font-size:12px}
+tbody td:before{content:attr(data-label);float:left;font-weight:600;color:#5c6675;text-transform:uppercase;font-size:10px}
+tbody tr{display:block;padding:8px 0;border-bottom:1px solid #e8e8e8}
+tbody tr:last-child td:last-child{border:none}
+tbody tr:last-child{border:none}
 
 /* GRAFICO */
-.chart-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:24px}
-.chart-card h3{font-size:15px;font-weight:700;color:var(--primary);margin-bottom:4px}
-.chart-card .desc{font-size:12px;color:#5c6675;margin-bottom:14px}
-.chart-card canvas{max-height:260px}
+.chart-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:16px}
+.chart-card h3{font-size:14px;font-weight:700;color:var(--primary);margin-bottom:2px}
+.chart-card .desc{font-size:11px;color:#5c6675;margin-bottom:10px}
+.chart-card canvas{max-height:200px}
 
 /* TABELA REGRAS */
-.regras{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 24px;margin-bottom:24px}
-.regras h3{font-size:15px;font-weight:700;color:var(--primary);margin-bottom:12px}
-.regras table{min-width:auto;font-size:12.5px}
-.regras thead th{font-size:11px;padding:8px 10px}
-.regras tbody td{padding:8px 10px}
+.regras{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:16px}
+.regras h3{font-size:14px;font-weight:700;color:var(--primary);margin-bottom:10px}
+.regras table{font-size:11px}
+.regras tbody td{padding:6px 8px;display:table-cell;text-align:left}
+.regras tbody td:before{content:none}
+.regras tbody tr{display:table-row;padding:0;border:none}
+.regras thead{display:table-header-group}
+.regras thead th{font-size:10px;padding:6px 8px;background:var(--primary);color:var(--white);text-align:left;font-weight:600;text-transform:uppercase;letter-spacing:0.2px}
 
-.data-hint{font-size:12px;color:#5c6675;margin-top:6px;text-align:center}
+.data-hint{font-size:11px;color:#5c6675;margin-top:6px;text-align:center}
 
-.footer{text-align:center;font-size:12px;color:#5c6675;padding:20px 0 8px}
+.footer{text-align:center;font-size:11px;color:#5c6675;padding:16px 0 6px}
 
-@media(max-width:600px){
-  .wrap{padding:14px}
-  .hero{padding:24px 20px}
-  .hero h1{font-size:20px}
-  .metricas-grid{grid-template-columns:1fr 1fr}
-  .form-row{grid-template-columns:1fr 1fr}
-  .regras table{font-size:11.5px}
-  .chart-card{padding:16px}
+@media(min-width:600px){
+  .wrap{padding:24px}
+  .hero{padding:32px 36px}
+  .hero h1{font-size:26px}
+  .metricas-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .form-card{padding:24px}
+  .form-row{grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}
+  .form-row-btn button{flex:initial;min-width:auto}
+  .chart-card{padding:20px 22px}
+  .chart-card canvas{max-height:260px}
+  .regras{padding:20px 24px}
+  .veredito{padding:24px 28px}
+  .veredito .icon{font-size:42px}
+
+  /* tablets desfaz table mobile */
+  thead{display:table-header-group}
+  tbody td{padding:10px 14px;border-bottom:1px solid #f0f0f0;display:table-cell;text-align:left;font-size:13px}
+  tbody td:before{content:none}
+  tbody tr{display:table-row;padding:0;border:none}
+  tbody tr:hover{background:#f8f9fb}
+  tbody tr:last-child td{border:none}
+  table{min-width:700px;font-size:13px}
+  thead th{background:var(--primary);color:var(--white);text-align:left;padding:10px 14px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.3px}
+  .table-section{overflow-x:auto}
 }
 </style>
 </head>
@@ -113,15 +135,12 @@ tbody tr:last-child td{border:none}
     <div class="tag">&#128202; Data-Driven Scaling</div>
     <h1>Dashboard de Decisão — Alan Damasceno</h1>
     <p>Acompanhe os indicadores que determinam se é hora de escalar a operação. Só invista em tráfego ou equipe quando os gatilhos baterem.</p>
-    <p style="margin-top:10px;font-size:13px">
-      <a href="captura.html" style="color:var(--accent);text-decoration:underline">&#128172; Capturar Lead</a>
-      &middot;
-      <a href="/" style="color:var(--accent);text-decoration:underline">&#127968; Mini-site</a>
-      &middot;
-      <span style="color:#b8c4d4">Total leads: <strong style="color:var(--accent)" id="totalLeadsCount">0</strong></span>
-      &middot;
-      <span id="cloudBadge" style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#eee;color:#5c6675">🔄 Sincronizando...</span>
-    </p>
+    <div class="links">
+      <a href="captura.html" style="color:var(--accent);text-decoration:underline">&#128172; Capturar</a>
+      <a href="/" style="color:var(--accent);text-decoration:underline">&#127968; Site</a>
+      <span style="color:#b8c4d4">Total: <strong style="color:var(--accent)" id="totalLeadsCount">0</strong></span>
+      <span id="cloudBadge" style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;background:#eee;color:#5c6675">🔄 Sincronizando...</span>
+    </div>
   </div>
 
   <div class="veredito" id="vereditoCard">
@@ -230,7 +249,7 @@ tbody tr:last-child td{border:none}
 
   <!-- OVERLAY + PAINEL DE PERFIL -->
   <div id="leadProfileOverlay" onclick="fecharPerfilLead()" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:999"></div>
-  <div id="leadProfilePanel" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border-radius:var(--radius);padding:28px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;z-index:1000;box-shadow:0 10px 40px rgba(0,0,0,0.3)">
+  <div id="leadProfilePanel" style="display:none;position:fixed;bottom:0;left:0;width:100%;max-height:85vh;overflow-y:auto;z-index:1000;background:var(--white);border-radius:var(--radius) var(--radius) 0 0;padding:20px;box-shadow:0 -4px 20px rgba(0,0,0,0.2);transition:transform 0.3s">
     <div id="profileContent"></div>
   </div>
 
@@ -588,16 +607,16 @@ function atualizarTabela(dados) {
     const fonte = d.leads_auto ? " <span style='font-size:10px;color:#5c6675'>(auto)</span>" : "";
     return `
       <tr>
-        <td>${d.semana}</td>
-        <td>${d.leads}${fonte}</td>
-        <td>${d.qualificados}${fonte}</td>
-        <td>${taxa}%</td>
-        <td>${d.visitas}</td>
-        <td>${d.propostas}</td>
-        <td>${d.fechamentos}</td>
-        <td>R$ ${d.comissao.toFixed(0)}</td>
-        <td>R$ ${d.trafego.toFixed(0)}</td>
-        <td>${custo === "-" ? "-" : "R$ " + custo}</td>
+        <td data-label="Semana">${d.semana}</td>
+        <td data-label="Leads">${d.leads}${fonte}</td>
+        <td data-label="Qualif.">${d.qualificados}${fonte}</td>
+        <td data-label="% Qualif.">${taxa}%</td>
+        <td data-label="Visitas">${d.visitas}</td>
+        <td data-label="Propostas">${d.propostas}</td>
+        <td data-label="Fech.">${d.fechamentos}</td>
+        <td data-label="Comissão">R$ ${d.comissao.toFixed(0)}</td>
+        <td data-label="Tráfego">R$ ${d.trafego.toFixed(0)}</td>
+        <td data-label="Custo/Lead">${custo === "-" ? "-" : "R$ " + custo}</td>
       </tr>
     `;
   }).reverse().join("");
@@ -640,46 +659,46 @@ function renderPerfil(l, editing, tempCls) {
     const wppLink = wpp ? `https://wa.me/55${wpp.replace(/\D/g,'')}?text=Ol%C3%A1%20${encodeURIComponent(l.respostas.nome||'')}!%20Vi%20seu%20contato%20aqui%20no%20meu%20dashboard%20e%20gostaria%20de%20saber%20mais%20sobre%20im%C3%B3veis%20em%20Fortaleza.` : "";
     const emailLink = email ? `mailto:${email}?subject=Im%C3%B3veis%20Fortaleza%20-%20Alan%20Damasceno` : "";
     document.getElementById("profileContent").innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <h3 style="color:var(--primary);font-size:18px;font-weight:700">${l.respostas.nome || "Sem nome"}</h3>
-        <span class="badge ${tempCls}" style="font-size:13px;padding:5px 14px">${temp} · ${score}/100</span>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:8px">
+        <h3 style="color:var(--primary);font-size:17px;font-weight:700">${l.respostas.nome || "Sem nome"}</h3>
+        <span class="badge ${tempCls}" style="font-size:12px;padding:4px 12px;white-space:nowrap">${temp} · ${score}/100</span>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         ${entries.map(([k,v]) => `
-          <div style="background:#f8f9fa;border-radius:6px;padding:10px 12px">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;color:#5c6675">${k}</div>
-            <div style="font-size:14px;font-weight:600;color:var(--text);margin-top:2px">${v}</div>
+          <div style="background:#f8f9fa;border-radius:6px;padding:8px 10px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.2px;color:#5c6675">${k}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:1px;word-break:break-word">${v}</div>
           </div>
         `).join("")}
       </div>
-      <div style="margin-top:14px;font-size:12px;color:#5c6675">Capturado em: ${dataStr}</div>
-      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
-        ${wpp ? `<a href="${wppLink}" target="_blank" style="flex:1;min-width:120px;text-align:center;padding:10px;background:#25D366;color:#fff;border-radius:var(--radius);font-weight:600;font-size:13px;text-decoration:none">💬 WhatsApp</a>` : ""}
-        ${email ? `<a href="${emailLink}" target="_blank" style="flex:1;min-width:120px;text-align:center;padding:10px;background:var(--secondary);color:#fff;border-radius:var(--radius);font-weight:600;font-size:13px;text-decoration:none">✉️ E-mail</a>` : ""}
+      <div style="margin-top:10px;font-size:11px;color:#5c6675">Capturado em: ${dataStr}</div>
+      <div style="display:flex;gap:6px;margin-top:10px">
+        ${wpp ? `<a href="${wppLink}" target="_blank" style="flex:1;text-align:center;padding:10px;background:#25D366;color:#fff;border-radius:var(--radius);font-weight:600;font-size:12px;text-decoration:none;min-height:38px;display:flex;align-items:center;justify-content:center">💬 WhatsApp</a>` : ""}
+        ${email ? `<a href="${emailLink}" target="_blank" style="flex:1;text-align:center;padding:10px;background:var(--secondary);color:#fff;border-radius:var(--radius);font-weight:600;font-size:12px;text-decoration:none;min-height:38px;display:flex;align-items:center;justify-content:center">✉️ E-mail</a>` : ""}
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button onclick="editarPerfilLead()" style="flex:1;padding:12px;background:var(--accent);color:var(--primary);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">✏️ Editar</button>
-        <button onclick="fecharPerfilLead()" style="flex:1;padding:12px;background:var(--primary);color:var(--white);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">Fechar</button>
+      <div style="display:flex;gap:6px;margin-top:6px">
+        <button onclick="editarPerfilLead()" style="flex:1;padding:10px;background:var(--accent);color:var(--primary);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit;font-size:13px;min-height:38px">✏️ Editar</button>
+        <button onclick="fecharPerfilLead()" style="flex:1;padding:10px;background:var(--primary);color:var(--white);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit;font-size:13px;min-height:38px">Fechar</button>
       </div>
     `;
   } else {
     document.getElementById("profileContent").innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-        <h3 style="color:var(--primary);font-size:18px;font-weight:700">✏️ Editando</h3>
-        <span class="badge ${tempCls}" style="font-size:13px;padding:5px 14px">${temp} · ${score}/100</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;gap:8px">
+        <h3 style="color:var(--primary);font-size:17px;font-weight:700">✏️ Editando</h3>
+        <span class="badge ${tempCls}" style="font-size:12px;padding:4px 12px;white-space:nowrap">${temp} · ${score}/100</span>
       </div>
-      <div id="editGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div id="editGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
         ${entries.map(([k,v]) => `
-          <div style="background:#f8f9fa;border-radius:6px;padding:10px 12px">
-            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;color:#5c6675;margin-bottom:4px">${k}</div>
-            <input id="edit_${k}" value="${(v || '').replace(/"/g,'&quot;')}" style="width:100%;padding:8px 10px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;font-family:inherit;outline:none">
+          <div style="background:#f8f9fa;border-radius:6px;padding:8px 10px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.2px;color:#5c6675;margin-bottom:2px">${k}</div>
+            <input id="edit_${k}" value="${(v || '').replace(/"/g,'&quot;')}" style="width:100%;padding:8px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;font-family:inherit;outline:none;min-height:36px">
           </div>
         `).join("")}
       </div>
-      <div style="margin-top:14px;font-size:12px;color:#5c6675">Capturado em: ${dataStr}</div>
-      <div style="display:flex;gap:8px;margin-top:16px">
-        <button onclick="salvarEdicaoLead()" style="flex:1;padding:12px;background:var(--quente);color:var(--white);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">💾 Salvar</button>
-        <button onclick="cancelarEdicaoLead()" style="flex:1;padding:12px;background:#eee;color:var(--text);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">Cancelar</button>
+      <div style="margin-top:10px;font-size:11px;color:#5c6675">Capturado em: ${dataStr}</div>
+      <div style="display:flex;gap:6px;margin-top:12px">
+        <button onclick="salvarEdicaoLead()" style="flex:1;padding:10px;background:var(--quente);color:var(--white);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit;font-size:13px;min-height:38px">💾 Salvar</button>
+        <button onclick="cancelarEdicaoLead()" style="flex:1;padding:10px;background:#eee;color:var(--text);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit;font-size:13px;min-height:38px">Cancelar</button>
       </div>
     `;
   }
@@ -742,18 +761,18 @@ function atualizarLeadsTable() {
     const emailLink = email ? `mailto:${email}?subject=Im%C3%B3veis%20Fortaleza%20-%20Alan%20Damasceno` : "";
     return `
       <tr>
-        <td>${new Date(l.data).toLocaleDateString("pt-BR")}</td>
-        <td><a href="#" onclick="verPerfilLead(${i});return false" style="color:var(--secondary);font-weight:600;text-decoration:underline">${l.respostas.nome || "-"}</a></td>
-        <td><span class="badge ${tempCls}">${l.temperatura}</span></td>
-        <td>${l.score}/100</td>
-        <td style="font-size:13px">
+        <td data-label="Data">${new Date(l.data).toLocaleDateString("pt-BR")}</td>
+        <td data-label="Nome"><a href="#" onclick="verPerfilLead(${i});return false" style="color:var(--secondary);font-weight:600;text-decoration:underline">${l.respostas.nome || "-"}</a></td>
+        <td data-label="Temp."><span class="badge ${tempCls}">${l.temperatura}</span></td>
+        <td data-label="Score">${l.score}/100</td>
+        <td data-label="Contato" style="font-size:12px">
           ${wpp ? `<a href="${wppLink}" target="_blank" style="text-decoration:none;color:#25D366;font-weight:600">💬 ${wpp}</a>` : ""}
           ${wpp && email ? " / " : ""}
           ${email ? `<a href="${emailLink}" target="_blank" style="text-decoration:none;color:var(--secondary);font-weight:600">✉️ ${email}</a>` : ""}
           ${!wpp && !email ? "-" : ""}
         </td>
-        <td>
-          <button onclick="excluirLead(${leads.length - 1 - i})" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:16px;padding:2px 6px" title="Excluir lead">🗑️</button>
+        <td data-label="Ação">
+          <button onclick="excluirLead(${leads.length - 1 - i})" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:18px;padding:4px 8px;min-height:38px" title="Excluir lead">🗑️</button>
         </td>
       </tr>
     `;
