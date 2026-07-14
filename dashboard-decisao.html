@@ -219,7 +219,7 @@ tbody tr:last-child td{border:none}
           <th>Nome</th>
           <th>Temp.</th>
           <th>Score</th>
-          <th>Contato</th>
+          <th>Enviar Mensagem Contato</th>
           <th>Ação</th>
         </tr>
       </thead>
@@ -746,14 +746,11 @@ function atualizarLeadsTable() {
         <td><a href="#" onclick="verPerfilLead(${i});return false" style="color:var(--secondary);font-weight:600;text-decoration:underline">${l.respostas.nome || "-"}</a></td>
         <td><span class="badge ${tempCls}">${l.temperatura}</span></td>
         <td>${l.score}/100</td>
-        <td>
-          <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:#5c6675;margin-bottom:4px">Contato</div>
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            ${wpp ? `<a href="${wppLink}" target="_blank" title="Enviar WhatsApp" style="display:inline-flex;align-items:center;gap:4px;background:#25D366;color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap">💬</a>` : ""}
-            ${email ? `<a href="${emailLink}" target="_blank" title="Enviar e-mail" style="display:inline-flex;align-items:center;gap:4px;background:var(--secondary);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap">✉️</a>` : ""}
-            ${!wpp && !email ? "-" : ""}
-            <span style="font-size:11px;color:#5c6675">${wpp ? wpp : ""}${email ? " / " + email : ""}</span>
-          </div>
+        <td style="font-size:13px">
+          ${wpp ? `<a href="${wppLink}" target="_blank" style="text-decoration:none;color:#25D366;font-weight:600">💬 ${wpp}</a>` : ""}
+          ${wpp && email ? " / " : ""}
+          ${email ? `<a href="${emailLink}" target="_blank" style="text-decoration:none;color:var(--secondary);font-weight:600">✉️ ${email}</a>` : ""}
+          ${!wpp && !email ? "-" : ""}
         </td>
         <td>
           <button onclick="excluirLead(${leads.length - 1 - i})" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:16px;padding:2px 6px" title="Excluir lead">🗑️</button>
