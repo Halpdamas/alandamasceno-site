@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alan Damasceno | Qualificação de Lead</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1B2B4B;
+  --accent: #D4A017;
+  --bg: #F8F9FA;
+  --text: #222;
+  --white: #fff;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(27,43,75,0.08);
+  --quente: #1e8449;
+  --morno: #d68910;
+  --frio: #2874a6;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+.wrap{max-width:720px;margin:0 auto;padding:24px;flex:1;display:flex;flex-direction:column;justify-content:center}
+
+/* HEADER */
+.header-bar{background:var(--primary);color:var(--white);padding:14px 24px;text-align:center;font-size:13px;font-weight:600}
+.header-bar span{color:var(--accent)}
+
+/* CARD PRINCIPAL */
+.card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+.card-top{background:linear-gradient(135deg,var(--primary),#1c3352);padding:28px 28px 22px;text-align:center}
+.card-top .wordmark{width:64px;height:64px;border-radius:50%;object-fit:cover;margin:0 auto 12px;border:3px solid var(--accent);display:block}
+.card-top h2{color:var(--white);font-size:20px;font-weight:700}
+.card-top p{color:#b8c4d4;font-size:14px;margin-top:4px}
+
+/* CHAT */
+.chat-area{padding:20px 24px;max-height:420px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:85%;padding:12px 16px;border-radius:12px;font-size:14px;animation:fadeIn 0.3s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.bot{background:#f0f2f5;border-bottom-left-radius:4px;align-self:flex-start;color:var(--text)}
+.msg.user{background:var(--primary);color:var(--white);border-bottom-right-radius:4px;align-self:flex-end}
+.msg .label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px;opacity:0.6}
+.msg.loading .dots{display:inline-flex;gap:4px}
+.msg.loading .dots span{width:6px;height:6px;border-radius:50%;background:#999;animation:blink 1.4s infinite both}
+.msg.loading .dots span:nth-child(2){animation-delay:0.2s}
+.msg.loading .dots span:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
+
+/* INPUT */
+.input-area{padding:16px 24px 24px;border-top:1px solid #eee}
+.input-row{display:flex;gap:10px}
+.input-row input{flex:1;padding:12px 16px;border:1.5px solid #ddd;border-radius:var(--radius);font-size:14px;font-family:inherit;outline:none;transition:border 0.2s}
+.input-row input:focus{border-color:var(--accent)}
+.input-row input:disabled{background:#f5f5f5}
+.input-row button{padding:12px 22px;background:var(--accent);color:var(--primary);border:none;border-radius:var(--radius);font-weight:600;font-size:14px;cursor:pointer;transition:background 0.2s;white-space:nowrap}
+.input-row button:hover{background:#c08e10}
+.input-row button:disabled{opacity:0.5;cursor:not-allowed}
+
+/* OPCOES RAPIDAS */
+.opcoes{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.opcao-btn{padding:8px 16px;border:1.5px solid var(--primary);border-radius:20px;background:transparent;color:var(--primary);font-size:13px;font-weight:500;cursor:pointer;transition:all 0.15s;font-family:inherit}
+.opcao-btn:hover{background:var(--primary);color:var(--white)}
+
+/* RESULTADO FINAL */
+.resultado{display:none;padding:24px}
+.resultado.show{display:block;animation:fadeIn 0.4s ease}
+.resultado h3{font-size:18px;font-weight:700;color:var(--primary);margin-bottom:16px;text-align:center}
+.resultado-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.resultado-item{background:#f8f9fa;border-radius:8px;padding:12px 14px}
+.resultado-item .label{font-size:11px;text-transform:uppercase;letter-spacing:0.4px;color:#5c6675;font-weight:600}
+.resultado-item .value{font-size:14px;font-weight:600;color:var(--text);margin-top:2px}
+.resultado .score{text-align:center;margin-bottom:20px}
+.resultado .score .num{font-size:42px;font-weight:800}
+.resultado .score .num.alta{color:var(--quente)}
+.resultado .score .num.media{color:var(--morno)}
+.resultado .score .num.baixa{color:var(--frio)}
+.resultado .score .label{font-size:13px;color:#5c6675}
+.resultado .btn-final{display:block;width:100%;padding:14px;text-align:center;background:var(--accent);color:var(--primary);border:none;border-radius:var(--radius);font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:background 0.2s;text-decoration:none}
+.resultado .btn-final:hover{background:#c08e10}
+.resultado .btn-whatsapp{display:block;width:100%;padding:14px;text-align:center;background:#25D366;color:var(--white);border:none;border-radius:var(--radius);font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:background 0.2s;text-decoration:none;margin-top:8px}
+.resultado .btn-whatsapp:hover{background:#1da851}
+.resultado .lead-data{font-size:12px;color:#5c6675;text-align:center;margin-top:12px;word-break:break-all}
+
+/* CONTADOR */
+.counter-bar{background:var(--primary);margin:0 24px 4px;border-radius:0 0 var(--radius) var(--radius);padding:10px 18px;display:flex;justify-content:space-between;font-size:12px;color:#b8c4d4}
+.counter-bar strong{color:var(--white)}
+
+@media(max-width:600px){
+  .wrap{padding:12px}
+  .chat-area{padding:16px;max-height:360px}
+  .msg{max-width:92%;font-size:13px}
+  .input-area{padding:12px 16px 16px}
+  .input-row button{padding:12px 16px;font-size:13px}
+  .resultado-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="header-bar">
+  &#128172; <strong>Alan Damasceno</strong> &mdash; <span>Atendimento Inteligente</span> &middot; Imóveis Fortaleza - CE
+  &middot; <a href="dashboard-decisao.html" style="color:var(--accent);text-decoration:underline">Dashboard</a>
+  &middot; <a href="/" style="color:var(--accent);text-decoration:underline">Site</a>
+</div>
+
+<div class="wrap">
+  <div class="card" id="app">
+    <div class="card-top">
+      <img src="assets/alan-foto.png" alt="Alan Damasceno" class="wordmark">
+      <h2>Encontre o imóvel ideal</h2>
+      <p>Responda algumas perguntas rápidas para eu entender seu perfil</p>
+    </div>
+
+    <div class="chat-area" id="chat"></div>
+
+    <div class="input-area" id="inputArea">
+      <div class="input-row">
+        <input type="text" id="userInput" placeholder="Digite sua resposta..." autofocus>
+        <button id="sendBtn">Enviar</button>
+      </div>
+      <div id="opcoesContainer" class="opcoes"></div>
+    </div>
+
+    <div class="resultado" id="resultado">
+      <h3>&#9989; Qualificação concluída</h3>
+      <div class="score" id="scoreDisplay"></div>
+      <div class="resultado-grid" id="resultadoGrid"></div>
+      <a id="whatsappLink" target="_blank" class="btn-whatsapp">&#128172; Falar com Alan no WhatsApp</a>
+      <div class="lead-data" id="leadData"></div>
+    </div>
+  </div>
+
+  <div class="counter-bar">
+    <span>Leads qualificados hoje: <strong id="todayCount">0</strong></span>
+    <span>Taxa de qualificação: <strong id="qualRate">0%</strong></span>
+  </div>
+</div>
+
+<script>
+const PERGUNTAS = [
+  {
+    q: "Qual é o seu nome?",
+    chave: "nome",
+    tipo: "texto",
+    opcoes: null
+  },
+  {
+    q: "Você está buscando imóvel para moradia ou investimento?",
+    chave: "finalidade",
+    tipo: "opcao",
+    opcoes: ["Moradia", "Investimento", "Ainda não decidi"]
+  },
+  {
+    q: "Qual faixa de orçamento você tem em mente?",
+    chave: "orcamento",
+    tipo: "opcao",
+    opcoes: ["Até R$ 300 mil", "R$ 300 mil a R$ 600 mil", "R$ 600 mil a R$ 1 milhão", "Acima de R$ 1 milhão"]
+  },
+  {
+    q: "Já tem imóvel para dar de entrada ou usaria financiamento?",
+    chave: "pagamento",
+    tipo: "opcao",
+    opcoes: ["Financiamento", "Entrada + financiamento", "À vista", "Ainda não sei"]
+  },
+  {
+    q: "Qual bairro ou região de Fortaleza você prefere?",
+    chave: "bairro",
+    tipo: "texto",
+    opcoes: null
+  },
+  {
+    q: "Você tem prazo definido para comprar?",
+    chave: "prazo",
+    tipo: "opcao",
+    opcoes: ["Urgente (até 30 dias)", "Curto prazo (1 a 3 meses)", "Médio prazo (3 a 6 meses)", "Sem pressa, estou pesquisando"]
+  }
+];
+
+const SCORE_MAP = {
+  finalidade: { "Moradia": 20, "Investimento": 25, "Ainda não decidi": 5 },
+  orcamento: { "Até R$ 300 mil": 5, "R$ 300 mil a R$ 600 mil": 15, "R$ 600 mil a R$ 1 milhão": 25, "Acima de R$ 1 milhão": 30 },
+  pagamento: { "À vista": 30, "Entrada + financiamento": 20, "Financiamento": 10, "Ainda não sei": 5 },
+  prazo: { "Urgente (até 30 dias)": 25, "Curto prazo (1 a 3 meses)": 20, "Médio prazo (3 a 6 meses)": 10, "Sem pressa, estou pesquisando": 5 }
+};
+
+let passo = 0;
+let respostas = {};
+let isProcessing = false;
+
+const chat = document.getElementById("chat");
+const input = document.getElementById("userInput");
+const sendBtn = document.getElementById("sendBtn");
+const opcoesContainer = document.getElementById("opcoesContainer");
+const resultadoDiv = document.getElementById("resultado");
+const inputArea = document.getElementById("inputArea");
+
+function addMsg(texto, tipo) {
+  const div = document.createElement("div");
+  div.className = `msg ${tipo}`;
+  if (tipo === "bot") {
+    div.innerHTML = `<div class="label">&#9889; Alan Damasceno IA</div>${texto}`;
+  } else {
+    div.innerHTML = `<div class="label">Você</div>${texto}`;
+  }
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addLoading() {
+  const div = document.createElement("div");
+  div.className = "msg bot loading";
+  div.id = "loadingMsg";
+  div.innerHTML = `<div class="label">&#9889; Alan Damasceno IA</div><div class="dots"><span></span><span></span><span></span></div>`;
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function removeLoading() {
+  const el = document.getElementById("loadingMsg");
+  if (el) el.remove();
+}
+
+function setOpcoes(opcoes) {
+  opcoesContainer.innerHTML = "";
+  if (!opcoes) {
+    opcoesContainer.style.display = "none";
+    input.style.display = "block";
+    sendBtn.style.display = "inline-block";
+    return;
+  }
+  opcoesContainer.style.display = "flex";
+  input.style.display = "none";
+  sendBtn.style.display = "none";
+  opcoes.forEach(o => {
+    const btn = document.createElement("button");
+    btn.className = "opcao-btn";
+    btn.textContent = o;
+    btn.onclick = () => responder(o);
+    opcoesContainer.appendChild(btn);
+  });
+}
+
+function responder(valor) {
+  if (isProcessing) return;
+  isProcessing = true;
+  const pergunta = PERGUNTAS[passo - 1];
+  if (pergunta) {
+    respostas[pergunta.chave] = valor;
+    addMsg(valor, "user");
+  }
+  setOpcoes(null);
+  setTimeout(proximoPasso, 400);
+}
+
+function proximoPasso() {
+  if (passo < PERGUNTAS.length) {
+    const p = PERGUNTAS[passo];
+    passo++;
+    addLoading();
+    setTimeout(() => {
+      removeLoading();
+      addMsg(p.q, "bot");
+      setOpcoes(p.opcoes);
+      if (p.tipo === "texto") {
+        input.style.display = "block";
+        sendBtn.style.display = "inline-block";
+        input.focus();
+      }
+      isProcessing = false;
+    }, 600 + Math.random() * 400);
+  } else {
+    finalizar();
+  }
+}
+
+function calcularScore() {
+  let score = 10;
+  if (respostas.finalidade && SCORE_MAP.finalidade[respostas.finalidade]) {
+    score += SCORE_MAP.finalidade[respostas.finalidade];
+  }
+  if (respostas.orcamento && SCORE_MAP.orcamento[respostas.orcamento]) {
+    score += SCORE_MAP.orcamento[respostas.orcamento];
+  }
+  if (respostas.pagamento && SCORE_MAP.pagamento[respostas.pagamento]) {
+    score += SCORE_MAP.pagamento[respostas.pagamento];
+  }
+  if (respostas.prazo && SCORE_MAP.prazo[respostas.prazo]) {
+    score += SCORE_MAP.prazo[respostas.prazo];
+  }
+  return Math.min(score, 100);
+}
+
+function getTemperatura(score) {
+  if (score >= 70) return { label: "Quente", cls: "alta" };
+  if (score >= 45) return { label: "Morno", cls: "media" };
+  return { label: "Frio", cls: "baixa" };
+}
+
+function finalizar() {
+  addLoading();
+  setTimeout(() => {
+    removeLoading();
+    const score = calcularScore();
+    const temp = getTemperatura(score);
+
+    addMsg("Perfeito! Com base nas suas respostas, já tenho um bom panorama do seu perfil. Vou direcionar seu contato para o Alan.", "bot");
+
+    setTimeout(() => {
+      inputArea.style.display = "none";
+      resultadoDiv.classList.add("show");
+
+      const scoreEl = document.getElementById("scoreDisplay");
+      scoreEl.innerHTML = `
+        <div class="num ${temp.cls}">${score}</div>
+        <div class="label">Score de Qualificação &middot; <strong>${temp.label}</strong></div>
+      `;
+
+      const grid = document.getElementById("resultadoGrid");
+      grid.innerHTML = Object.entries(respostas).map(([k, v]) => `
+        <div class="resultado-item">
+          <div class="label">${k}</div>
+          <div class="value">${v}</div>
+        </div>
+      `).join("");
+
+      const dados = encodeURIComponent(
+        `*Lead Qualificado - Alan Damasceno*\n\n` +
+        Object.entries(respostas).map(([k, v]) => `${k}: ${v}`).join("\n") +
+        `\nScore: ${score}/100 (${temp.label})`
+      );
+
+      document.getElementById("whatsappLink").href =
+        `https://wa.me/5585989633522?text=${dados}`;
+
+      const dataStr = JSON.stringify({
+        timestamp: new Date().toISOString(),
+        respostas,
+        score,
+        temperatura: temp.label
+      }, null, 2);
+      document.getElementById("leadData").textContent = "Dados do lead: " + dataStr;
+
+      salvarLead(score, temp.label);
+      isProcessing = false;
+    }, 800);
+  }, 600);
+}
+
+function salvarLead(score, temp) {
+  try {
+    let historico = JSON.parse(localStorage.getItem("alan_leads") || "[]");
+    historico.push({
+      data: new Date().toISOString(),
+      respostas,
+      score,
+      temperatura: temp
+    });
+    localStorage.setItem("alan_leads", JSON.stringify(historico));
+    sincronizarDashboard(score);
+    atualizarContadores();
+  } catch(e) {}
+}
+
+function sincronizarDashboard(score) {
+  try {
+    let dados = JSON.parse(localStorage.getItem("alan_dashboard") || "[]");
+    const hoje = new Date().toISOString().slice(0,10);
+    let entry = dados.find(d => d.semana === hoje);
+    if (!entry) {
+      entry = { semana: hoje, leads: 0, qualificados: 0, visitas: 0, propostas: 0, fechamentos: 0, comissao: 0, trafego: 0, tempo: 7 };
+      dados.push(entry);
+    }
+    entry.leads = (entry.leads || 0) + 1;
+    if (score >= 45) {
+      entry.qualificados = (entry.qualificados || 0) + 1;
+    }
+    localStorage.setItem("alan_dashboard", JSON.stringify(dados));
+  } catch(e) {}
+}
+
+function atualizarContadores() {
+  try {
+    const historico = JSON.parse(localStorage.getItem("alan_leads") || "[]");
+    const hoje = new Date().toDateString();
+    const hojeLeads = historico.filter(l =>
+      new Date(l.data).toDateString() === hoje
+    );
+    document.getElementById("todayCount").textContent = hojeLeads.length;
+
+    const total = historico.length;
+    const qualificados = historico.filter(l => l.score >= 45).length;
+    const taxa = total > 0 ? Math.round((qualificados / total) * 100) : 0;
+    document.getElementById("qualRate").textContent = taxa + "%";
+  } catch(e) {}
+}
+
+sendBtn.addEventListener("click", () => {
+  const texto = input.value.trim();
+  if (!texto || isProcessing) return;
+  input.value = "";
+  responder(texto);
+});
+
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") sendBtn.click();
+});
+
+atualizarContadores();
+proximoPasso();
+</script>
+</body>
+</html>

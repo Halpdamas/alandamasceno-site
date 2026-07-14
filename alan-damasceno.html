@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alan Damasceno | Imóveis Fortaleza - CE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #1B2B4B;
+  --secondary: #2F5D9F;
+  --accent: #D4A017;
+  --bg: #F8F9FA;
+  --text: #222;
+  --white: #FFFFFF;
+  --radius: 10px;
+  --shadow: 0 2px 12px rgba(27,43,75,0.07);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+.wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+a{text-decoration:none;color:inherit}
+img{max-width:100%;display:block}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,var(--primary) 0%,#1c3352 100%);color:var(--white);padding:52px 24px;text-align:center}
+.hero-inner{max-width:1100px;margin:0 auto}
+.hero-foto{width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto 18px;border:3px solid var(--accent);display:block}
+.hero .tag{font-size:11px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:10px}
+.hero h1{font-size:34px;font-weight:700;margin-bottom:10px}
+.hero .sub{font-size:15px;color:#b8c4d4;max-width:760px;margin:0 auto 26px;line-height:1.65}
+.hero .cta-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;border-radius:var(--radius);font-weight:600;font-size:15px;cursor:pointer;border:none;transition:all 0.2s}
+.btn-primary{background:var(--accent);color:var(--primary)}
+.btn-primary:hover{background:#c08e10;transform:translateY(-1px)}
+.btn-outline{background:transparent;color:var(--white);border:1.5px solid rgba(255,255,255,0.35)}
+.btn-outline:hover{border-color:var(--white)}
+.btn-whatsapp{background:#25D366;color:var(--white)}
+.btn-whatsapp:hover{background:#1da851}
+.btn-copy{background:var(--white);color:var(--primary)}
+.btn-copy:hover{background:#eee}
+
+/* SECTION */
+section{padding:64px 24px}
+.section-title{font-size:22px;font-weight:700;color:var(--primary);margin-bottom:4px}
+.section-title.centered{text-align:center}
+.section-sub{font-size:14px;color:#5c6675;margin-bottom:32px;max-width:640px}
+.section-sub.centered{text-align:center;margin-left:auto;margin-right:auto}
+
+/* SOBRE */
+.sobre-wrapper{display:flex;gap:36px;align-items:flex-start;max-width:960px;margin:0 auto}
+.sobre-text{flex:1}
+.sobre-text p{font-size:15px;color:#444;margin-bottom:14px;line-height:1.75}
+.sobre-text p:last-child{margin-bottom:0}
+.sobre-creci{display:inline-flex;align-items:center;gap:6px;margin-top:18px;font-size:12px;color:var(--accent);font-weight:700;letter-spacing:0.5px;border:1.5px solid var(--accent);padding:5px 16px;border-radius:20px}
+.sobre-foto{width:200px;height:200px;border-radius:var(--radius);object-fit:cover;flex-shrink:0;box-shadow:var(--shadow)}
+@media(max-width:768px){
+  .sobre-wrapper{flex-direction:column;align-items:center;text-align:center}
+  .sobre-foto{width:160px;height:160px}
+  .sobre-creci{margin-left:auto;margin-right:auto}
+}
+
+/* SERVICOS */
+.servicos-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.servico-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:30px 26px;border-top:3px solid var(--accent);transition:transform 0.2s}
+.servico-card:hover{transform:translateY(-3px)}
+.servico-card .icon{font-size:32px;margin-bottom:10px}
+.servico-card h3{font-size:17px;font-weight:700;color:var(--primary);margin-bottom:8px}
+.servico-card p{font-size:14px;color:#5c6675;line-height:1.65}
+.servico-card .link-parceiro{display:inline-block;margin-top:10px;font-size:13px;color:var(--secondary);font-weight:600}
+.servico-card .link-parceiro:hover{color:var(--accent)}
+
+/* CARTAO DIGITAL */
+.cartao-section{background:var(--primary)}
+.cartao-section .section-title{color:var(--white)}
+.cartao-section .section-sub{color:#b8c4d4}
+.cartao-grid{display:flex;gap:28px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+.cartao{max-width:360px;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.2);flex:1}
+.cartao-header{background:linear-gradient(135deg,var(--primary),#1c3352);padding:32px 24px;text-align:center}
+.cartao-foto{width:88px;height:88px;border-radius:50%;object-fit:cover;margin:0 auto 14px;border:3px solid var(--accent);display:block}
+.cartao-header h3{color:var(--white);font-size:19px;font-weight:700}
+.cartao-header .tag{color:var(--accent);font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.cartao-body{padding:24px}
+.cartao-info{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.cartao-info .linha{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text);padding:8px 0;border-bottom:1px solid #f0f0f0}
+.cartao-info .linha:last-child{border:none}
+.cartao-info .linha .ico{width:22px;text-align:center;font-size:16px;flex-shrink:0}
+.cartao-body .btn{width:100%;justify-content:center}
+.cartao-body .btn + .btn{margin-top:8px}
+.cartao-body .btn-instagram{width:100%;justify-content:center;font-size:14px;padding:12px;margin-top:8px;background:linear-gradient(135deg,#833AB4,#E1306C);color:var(--white);border-radius:var(--radius);font-weight:600;display:flex;align-items:center;gap:8px;border:none;cursor:pointer;transition:opacity 0.2s}
+.cartao-body .btn-instagram:hover{opacity:0.9}
+
+/* QR CARD */
+.qr-card{background:var(--white);border-radius:var(--radius);padding:28px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.2);max-width:280px;flex-shrink:0}
+.qr-card h4{font-size:14px;color:var(--primary);font-weight:700;margin-bottom:12px}
+.qr-card img{width:160px;height:160px;margin:0 auto 12px;border-radius:6px}
+.qr-card .qr-hint{font-size:12px;color:#5c6675;line-height:1.5}
+.qr-card .btn-copy{display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:9px 20px;border-radius:var(--radius);background:var(--accent);color:var(--primary);font-weight:600;font-size:13px;border:none;cursor:pointer;font-family:inherit;transition:background 0.2s}
+.qr-card .btn-copy:hover{background:#c08e10}
+
+/* FOOTER */
+.footer{text-align:center;font-size:13px;color:#5c6675;padding:36px 24px;border-top:1px solid #e5e7eb}
+.footer a{color:var(--secondary);font-weight:600}
+.footer a:hover{color:var(--accent)}
+
+@media (max-width:600px){
+  .hero{padding:36px 20px}
+  .hero h1{font-size:24px}
+  .hero .sub{font-size:13.5px}
+  .hero .cta-group{flex-direction:column;align-items:stretch}
+  .btn{justify-content:center}
+  section{padding:40px 20px}
+  .section-title{font-size:19px}
+  .servicos-grid{grid-template-columns:1fr}
+  .cartao-grid{flex-direction:column;align-items:center}
+  .qr-card{max-width:100%}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-inner">
+    <img src="assets/alan-foto.png" alt="Alan Damasceno" class="hero-foto">
+    <div class="tag">CRECI 27671 · Fortaleza - CE</div>
+    <h1>Alan Damasceno</h1>
+    <p class="sub">Imóveis de alto padrão e pré-lançamentos em Fortaleza - Ceará — Assessoria completa para Compra, Venda e Investimento para brasileiros e estrangeiros.</p>
+    <div class="cta-group">
+      <a href="https://wa.me/5585989633522?text=Ol%C3%A1%20Alan!%20Vi%20seu%20site%20e%20gostaria%20de%20saber%20mais%20sobre%20im%C3%B3veis%20em%20Fortaleza." target="_blank" class="btn btn-whatsapp">&#128172; Fale no WhatsApp</a>
+      <a href="#cartao" class="btn btn-outline">Cartão Digital</a>
+    </div>
+  </div>
+</header>
+
+<section id="sobre">
+  <div class="wrap">
+    <h2 class="section-title">Sobre</h2>
+    <p class="section-sub">Conhecimento de mercado, confiabilidade e atendimento personalizado</p>
+    <div class="sobre-wrapper">
+      <div class="sobre-text">
+        <p>Com atuação no mercado de médio e alto padrão de Fortaleza, ofereço assessoria completa para quem busca comprar, vender ou investir em imóveis na região. Meu trabalho vai além da apresentação de imóveis: acompanho cada etapa — da prospecção à entrega das chaves — com transparência e foco no que faz sentido para o seu perfil.</p>
+        <p>Atendo brasileiros e estrangeiros, com suporte documental especializado para compradores internacionais em parceria com a IMIBRA. Acompanho pré-lançamentos, negocio condições diferenciadas com construtoras e ofereço análise de valorização e liquidez para quem busca investimento seguro.</p>
+        <p>Cada cliente é tratado de forma única, com soluções sob medida para moradia, investimento ou regularização patrimonial.</p>
+        <span class="sobre-creci">&#128220; CRECI 27671 · Fortaleza - CE</span>
+      </div>
+      <img src="assets/alan-foto.png" alt="Alan Damasceno" class="sobre-foto">
+    </div>
+  </div>
+</section>
+
+<section id="servicos" style="background:var(--white)">
+  <div class="wrap">
+    <h2 class="section-title centered">Serviços</h2>
+    <p class="section-sub centered">Soluções completas para moradia, investimento e regularização</p>
+    <div class="servicos-grid">
+      <div class="servico-card">
+        <div class="icon">&#127968;</div>
+        <h3>Compra &amp; Venda</h3>
+        <p>Imóveis de médio e alto padrão em Fortaleza — apartamentos, coberturas, studios e casas nos melhores bairros da cidade. Assessoria completa na negociação e documentação.</p>
+      </div>
+      <div class="servico-card">
+        <div class="icon">&#127963;</div>
+        <h3>Pré-Lançamentos</h3>
+        <p>Acesso antecipado a empreendimentos com condições especiais. Acompanhamento desde o lançamento até a entrega, com negociação direta com as construtoras parceiras.</p>
+      </div>
+      <div class="servico-card">
+        <div class="icon">&#127758;</div>
+        <h3>Regularização para Estrangeiros</h3>
+        <p>Suporte documental completo para compradores estrangeiros, em parceria com a <strong>IMIBRA</strong> — especialistas em regularização de documentos no Brasil.</p>
+        <a href="https://www.imibra.com" target="_blank" class="link-parceiro">www.imibra.com &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cartao" class="cartao-section">
+  <div class="wrap">
+    <h2 class="section-title centered">Cartão Digital</h2>
+    <p class="section-sub centered">Compartilhe com seus clientes — eles acessam direto do celular</p>
+    <div class="cartao-grid">
+      <div class="cartao">
+        <div class="cartao-header">
+          <img src="assets/alan-foto.png" alt="Alan Damasceno" class="cartao-foto">
+          <h3>Alan Damasceno</h3>
+          <div class="tag">CRECI 27671 · Corretor de Imóveis</div>
+        </div>
+        <div class="cartao-body">
+          <div class="cartao-info">
+            <div class="linha"><span class="ico">&#128222;</span> (85) 98963-3522</div>
+            <div class="linha"><span class="ico">&#128247;</span> @alanpdamasceno</div>
+            <div class="linha"><span class="ico">&#127968;</span> Imóveis Fortaleza - CE</div>
+            <div class="linha"><span class="ico">&#127758;</span> Parceiro IMIBRA</div>
+          </div>
+          <a href="https://wa.me/5585989633522?text=Ol%C3%A1%20Alan!%20Vi%20seu%20cart%C3%A3o%20digital%20e%20gostaria%20de%20saber%20mais%20sobre%20im%C3%B3veis%20em%20Fortaleza." target="_blank" class="btn btn-whatsapp">&#128172; Chamar no WhatsApp</a>
+          <a href="https://instagram.com/alanpdamasceno" target="_blank" class="btn-instagram">&#128247; Seguir no Instagram</a>
+        </div>
+      </div>
+
+      <div class="qr-card">
+        <h4>&#128247; Compartilhe este cartão</h4>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://alandamascenocorretor.vercel.app" alt="QR Code">
+        <p class="qr-hint">Escaneie com o celular para acessar o cartão digital completo</p>
+        <button class="btn-copy" onclick="copiarLink()">&#128203; Copiar link do cartão</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>Alan Damasceno &mdash; CRECI 27671 &middot; Imóveis Fortaleza - CE &middot; <a href="https://instagram.com/alanpdamasceno" target="_blank">@alanpdamasceno</a></p>
+  <p style="margin-top:6px;font-size:12px">
+    <a href="captura.html" style="color:var(--secondary)">&#128172; Captura de Leads</a>
+    &middot;
+    <a href="dashboard-decisao.html" style="color:var(--secondary)">&#128202; Dashboard</a>
+    &middot;
+    Parceiro: <a href="https://www.imibra.com" target="_blank">IMIBRA</a>
+  </p>
+</footer>
+
+<script>
+function copiarLink() {
+  const url = window.location.href;
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(url).then(() => {
+      const btn = document.querySelector('.btn-copy');
+      btn.textContent = '✓ Link copiado!';
+      setTimeout(() => { btn.innerHTML = '&#128203; Copiar link do cartão'; }, 2000);
+    }).catch(() => fallbackCopy(url));
+  } else {
+    fallbackCopy(url);
+  }
+}
+function fallbackCopy(url) {
+  const ta = document.createElement('textarea');
+  ta.value = url;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  const btn = document.querySelector('.btn-copy');
+  btn.textContent = '✓ Link copiado!';
+  setTimeout(() => { btn.innerHTML = '&#128203; Copiar link do cartão'; }, 2000);
+}
+</script>
+</body>
+</html>

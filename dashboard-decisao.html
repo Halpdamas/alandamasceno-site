@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard de Decisão | Alan Damasceno</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
+<style>
+:root {
+  --primary: #1B2B4B;
+  --accent: #D4A017;
+  --bg: #F8F9FA;
+  --text: #222;
+  --white: #fff;
+  --quente: #1e8449;
+  --morno: #d68910;
+  --frio: #2874a6;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(27,43,75,0.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.5}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+
+.hero{background:linear-gradient(135deg,var(--primary),#1c3352);color:var(--white);border-radius:var(--radius);padding:32px 36px;margin-bottom:24px}
+.hero h1{font-size:26px;font-weight:700}
+.hero p{color:#b8c4d4;font-size:14px;margin-top:6px}
+.hero .tag{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:8px}
+
+.section-title{font-size:18px;font-weight:700;color:var(--primary);margin:28px 0 14px;display:flex;align-items:center;gap:10px}
+.section-title .badge{font-size:11px;background:var(--primary);color:var(--accent);padding:3px 10px;border-radius:20px;font-weight:700}
+
+/* VEREDITO */
+.veredito{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px 28px;text-align:center;margin-bottom:24px;border-top:4px solid var(--frio)}
+.veredito.ready{border-top-color:var(--quente)}
+.veredito .icon{font-size:42px;margin-bottom:8px}
+.veredito h2{font-size:20px;font-weight:700;color:var(--text)}
+.veredito p{font-size:14px;color:#5c6675;max-width:600px;margin:6px auto 0}
+.veredito .progress-container{max-width:500px;margin:16px auto 0}
+.veredito .progress-bar{height:8px;background:#eee;border-radius:10px;overflow:hidden}
+.veredito .progress-fill{height:100%;border-radius:10px;transition:width 0.5s ease}
+.veredito .progress-label{font-size:12px;color:#5c6675;margin-top:6px}
+
+/* METRICAS */
+.metricas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:24px}
+.metrica-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;border-left:4px solid var(--frio)}
+.metrica-card.ok{border-left-color:var(--quente)}
+.metrica-card.warn{border-left-color:var(--morno)}
+.metrica-card h3{font-size:13px;font-weight:600;color:#5c6675;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:4px}
+.metrica-card .valor{font-size:28px;font-weight:800;color:var(--text)}
+.metrica-card .meta{font-size:12px;color:#5c6675;margin-top:4px}
+.metrica-card .status{display:inline-block;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-top:6px}
+.status.ok{background:rgba(30,132,73,0.12);color:var(--quente)}
+.status.warn{background:rgba(214,137,16,0.12);color:var(--morno)}
+.status.fail{background:rgba(192,57,43,0.12);color:#c0392b}
+
+/* HISTORICO / FORM */
+.form-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:24px}
+.form-card h3{font-size:16px;font-weight:700;color:var(--primary);margin-bottom:14px}
+.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:14px}
+.form-group label{display:block;font-size:12px;font-weight:600;color:#5c6675;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.3px}
+.form-group input{width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border 0.2s}
+.form-group input:focus{border-color:var(--accent)}
+.form-row-btn{display:flex;gap:10px}
+.form-row-btn button{padding:11px 24px;border:none;border-radius:var(--radius);font-weight:600;font-size:14px;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.btn-add{background:var(--accent);color:var(--primary)}
+.btn-add:hover{background:#c08e10}
+.btn-reset{background:#eee;color:#5c6675}
+.btn-reset:hover{background:#ddd}
+
+/* TABELA */
+.table-section{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow-x:auto;margin-bottom:24px}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px}
+thead th{background:var(--primary);color:var(--white);text-align:left;padding:10px 14px;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:0.3px}
+tbody td{padding:10px 14px;border-bottom:1px solid #f0f0f0}
+tbody tr:hover{background:#f8f9fb}
+tbody tr:last-child td{border:none}
+
+/* GRAFICO */
+.chart-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px;margin-bottom:24px}
+.chart-card h3{font-size:15px;font-weight:700;color:var(--primary);margin-bottom:4px}
+.chart-card .desc{font-size:12px;color:#5c6675;margin-bottom:14px}
+.chart-card canvas{max-height:260px}
+
+/* TABELA REGRAS */
+.regras{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 24px;margin-bottom:24px}
+.regras h3{font-size:15px;font-weight:700;color:var(--primary);margin-bottom:12px}
+.regras table{min-width:auto;font-size:12.5px}
+.regras thead th{font-size:11px;padding:8px 10px}
+.regras tbody td{padding:8px 10px}
+
+.data-hint{font-size:12px;color:#5c6675;margin-top:6px;text-align:center}
+
+.footer{text-align:center;font-size:12px;color:#5c6675;padding:20px 0 8px}
+
+@media(max-width:600px){
+  .wrap{padding:14px}
+  .hero{padding:24px 20px}
+  .hero h1{font-size:20px}
+  .metricas-grid{grid-template-columns:1fr 1fr}
+  .form-row{grid-template-columns:1fr 1fr}
+  .regras table{font-size:11.5px}
+  .chart-card{padding:16px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hero">
+    <div class="tag">&#128202; Data-Driven Scaling</div>
+    <h1>Dashboard de Decisão — Alan Damasceno</h1>
+    <p>Acompanhe os indicadores que determinam se é hora de escalar a operação. Só invista em tráfego ou equipe quando os gatilhos baterem.</p>
+    <p style="margin-top:10px;font-size:13px">
+      <a href="captura.html" style="color:var(--accent);text-decoration:underline">&#128172; Capturar Lead</a>
+      &middot;
+      <a href="/" style="color:var(--accent);text-decoration:underline">&#127968; Mini-site</a>
+    </p>
+  </div>
+
+  <div class="veredito" id="vereditoCard">
+    <div class="icon" id="vereditoIcon">&#128200;</div>
+    <h2 id="vereditoTitle">Aguardando dados</h2>
+    <p id="vereditoText">Registre ao menos uma semana de indicadores para gerar a primeira análise.</p>
+    <div class="progress-container">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%;background:var(--frio)"></div></div>
+      <div class="progress-label" id="progressLabel">0 de 7 indicadores OK</div>
+    </div>
+  </div>
+
+  <div class="section-title">Indicadores Gatilho <span class="badge">SITUAÇÃO ATUAL</span></div>
+  <div class="metricas-grid" id="metricasContainer"></div>
+
+  <div class="section-title">Registrar Semana <span class="badge">LANÇAR DADOS</span></div>
+  <div class="form-card">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Leads recebidos</label>
+        <input type="number" id="f_leads" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label>Leads qualificados</label>
+        <input type="number" id="f_qualificados" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label>Visitas realizadas</label>
+        <input type="number" id="f_visitas" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label>Propostas emitidas</label>
+        <input type="number" id="f_propostas" min="0" value="0">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Fechamentos</label>
+        <input type="number" id="f_fechamentos" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label>Comissão recebida (R$)</label>
+        <input type="number" id="f_comissao" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label>Investimento tráfego (R$)</label>
+        <input type="number" id="f_trafego" min="0" value="0">
+      </div>
+      <div class="form-group">
+        <label>Dias p/ lead → visita</label>
+        <input type="number" id="f_tempo" min="0" value="7">
+      </div>
+    </div>
+    <div class="form-row-btn">
+      <button class="btn-add" onclick="registrarSemana()">+ Registrar Semana</button>
+      <button class="btn-reset" onclick="resetarDados()">Limpar Histórico</button>
+    </div>
+  </div>
+
+  <div class="section-title">Evolução Semanal <span class="badge">GRÁFICO</span></div>
+  <div class="chart-card">
+    <h3>Leads Qualificados vs Visitas</h3>
+    <div class="desc">Acompanhe a evolução ao longo das semanas</div>
+    <canvas id="chartEvolucao"></canvas>
+  </div>
+
+  <div class="section-title">Histórico de Registros <span class="badge">TABELA</span></div>
+  <div class="table-section">
+    <table>
+      <thead>
+        <tr>
+          <th>Semana</th>
+          <th>Leads</th>
+          <th>Qualif.</th>
+          <th>% Qualif.</th>
+          <th>Visitas</th>
+          <th>Propostas</th>
+          <th>Fech.</th>
+          <th>Comissão</th>
+          <th>Tráfego</th>
+          <th>Custo/Lead</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaBody"></tbody>
+    </table>
+    <div class="data-hint" id="dataHint">Nenhum registro ainda. Adicione sua primeira semana acima.</div>
+  </div>
+
+  <div class="section-title">Leads Capturados pela IA <span class="badge">ÚLTIMOS 20</span></div>
+  <div class="table-section">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Nome</th>
+          <th>Temperatura</th>
+          <th>Score</th>
+          <th>Finalidade</th>
+          <th>Prazo</th>
+        </tr>
+      </thead>
+      <tbody id="leadsBody"></tbody>
+    </table>
+    <div class="data-hint" id="leadsHint">Nenhum lead capturado ainda. Os leads da página de Captura aparecerão aqui automaticamente.</div>
+  </div>
+
+  <div class="section-title">Regras de Decisão <span class="badge">QUANDO ESCALAR</span></div>
+  <div class="regras">
+    <table>
+      <thead>
+        <tr>
+          <th>Indicador</th>
+          <th>Meta</th>
+          <th>Por que</th>
+          <th>Ação ao atingir</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Leads qualif./semana</strong></td>
+          <td>&ge; 5 por 3 semanas</td>
+          <td>Mostra demanda consistente</td>
+          <td>Ativar tráfego pago leve</td>
+        </tr>
+        <tr>
+          <td><strong>Taxa de qualificação</strong></td>
+          <td>&ge; 15%</td>
+          <td>Funil está saudável na entrada</td>
+          <td>Antes era 0,02% — melhoria de processo</td>
+        </tr>
+        <tr>
+          <td><strong>Visitas/semana</strong></td>
+          <td>&ge; 3 por 2 semanas</td>
+          <td>Lead está saindo do WhatsApp</td>
+          <td>Contratar assistente de visitas</td>
+        </tr>
+        <tr>
+          <td><strong>Propostas/semana</strong></td>
+          <td>&ge; 2 por 3 semanas</td>
+          <td>Funil avançado funciona</td>
+          <td>Aumentar investimento em mídia</td>
+        </tr>
+        <tr>
+          <td><strong>Tempo lead → visita</strong></td>
+          <td>&le; 7 dias</td>
+          <td>Velocidade de atendimento</td>
+          <td>Automatizar qualificação (Pilar 2)</td>
+        </tr>
+        <tr>
+          <td><strong>Custo por lead qualif.</strong></td>
+          <td>&le; R$ 50</td>
+          <td>ROI positivo no tráfego</td>
+          <td>Escalar investimento</td>
+        </tr>
+        <tr>
+          <td><strong>Receita mensal</strong></td>
+          <td>&ge; R$ 5.000</td>
+          <td>Operação se sustenta</td>
+          <td>Contratar equipe / ferramentas</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">Dashboard de Decisão — Alan Damasceno | Imóveis Fortaleza - CE — Dados salvos no navegador (localStorage)</div>
+</div>
+
+<script>
+const METAS = {
+  leads_qualif_semana: { meta: 5, label: "Leads qualif./semana", unidade: "lead" },
+  taxa_qualificacao: { meta: 15, label: "Taxa de qualificação", unidade: "%" },
+  visitas_semana: { meta: 3, label: "Visitas/semana", unidade: "visita" },
+  propostas_semana: { meta: 2, label: "Propostas/semana", unidade: "proposta" },
+  tempo_lead_visita: { meta: 7, label: "Tempo lead → visita", unidade: "dias" },
+  custo_lead_qualif: { meta: 50, label: "Custo/lead qualif.", unidade: "R$" },
+  receita_mensal: { meta: 5000, label: "Receita mensal", unidade: "R$" }
+};
+
+let chartInstance = null;
+
+function getDados() {
+  try {
+    return JSON.parse(localStorage.getItem("alan_dashboard") || "[]");
+  } catch(e) { return []; }
+}
+
+function getLeads() {
+  try {
+    return JSON.parse(localStorage.getItem("alan_leads") || "[]");
+  } catch(e) { return []; }
+}
+
+function mergeDadosCaptura(dados) {
+  const leads = getLeads();
+  if (leads.length === 0) return dados;
+  const semanas = {};
+  leads.forEach(l => {
+    const s = l.data.slice(0,10);
+    if (!semanas[s]) semanas[s] = { leads: 0, qualificados: 0 };
+    semanas[s].leads++;
+    if (l.score >= 45) semanas[s].qualificados++;
+  });
+  return dados.map(d => {
+    const auto = semanas[d.semana];
+    if (auto) {
+      d.leads_auto = auto.leads;
+      d.qualificados_auto = auto.qualificados;
+      d.leads = Math.max(d.leads || 0, auto.leads);
+      d.qualificados = Math.max(d.qualificados || 0, auto.qualificados);
+    }
+    return d;
+  });
+}
+
+function salvarDados(dados) {
+  localStorage.setItem("alan_dashboard", JSON.stringify(dados));
+}
+
+function registrarSemana() {
+  const entry = {
+    semana: new Date().toISOString().slice(0,10),
+    leads: parseInt(document.getElementById("f_leads").value) || 0,
+    qualificados: parseInt(document.getElementById("f_qualificados").value) || 0,
+    visitas: parseInt(document.getElementById("f_visitas").value) || 0,
+    propostas: parseInt(document.getElementById("f_propostas").value) || 0,
+    fechamentos: parseInt(document.getElementById("f_fechamentos").value) || 0,
+    comissao: parseFloat(document.getElementById("f_comissao").value) || 0,
+    trafego: parseFloat(document.getElementById("f_trafego").value) || 0,
+    tempo: parseInt(document.getElementById("f_tempo").value) || 7
+  };
+
+  let dados = getDados();
+  dados.push(entry);
+  salvarDados(dados);
+  atualizarTudo();
+  limparForm();
+}
+
+function limparForm() {
+  document.querySelectorAll(".form-card input[type=number]").forEach(i => i.value = "0");
+  document.getElementById("f_tempo").value = "7";
+}
+
+function resetarDados() {
+  if (!confirm("Tem certeza? Isso vai apagar todo o histórico.")) return;
+  localStorage.removeItem("alan_dashboard");
+  atualizarTudo();
+}
+
+function calcularIndicadores(dados) {
+  if (dados.length === 0) return null;
+
+  const ultimo = dados[dados.length - 1];
+  const ultimos3 = dados.slice(-3);
+  const ultimos2 = dados.slice(-2);
+
+  const mediaQualifSemana = Math.round(ultimos3.reduce((s, d) => s + d.qualificados, 0) / ultimos3.length);
+  const totalLeads = ultimos3.reduce((s, d) => s + d.leads, 0);
+  const totalQualif = ultimos3.reduce((s, d) => s + d.qualificados, 0);
+  const taxaQualif = totalLeads > 0 ? Math.round((totalQualif / totalLeads) * 100) : 0;
+  const mediaVisitas = Math.round(ultimos2.reduce((s, d) => s + d.visitas, 0) / ultimos2.length);
+  const mediaPropostas = Math.round(ultimos3.reduce((s, d) => s + d.propostas, 0) / ultimos3.length);
+  const mediaTempo = Math.round(ultimos3.reduce((s, d) => s + d.tempo, 0) / ultimos3.length);
+  const totalTrafego = ultimos3.reduce((s, d) => s + d.trafego, 0);
+  const custoLeadQualif = totalQualif > 0 ? Math.round(totalTrafego / totalQualif) : 999;
+  const receitaMensal = dados.slice(-4).reduce((s, d) => s + d.comissao, 0);
+
+  return {
+    leads_qualif_semana: { valor: mediaQualifSemana, atingiu: mediaQualifSemana >= METAS.leads_qualif_semana.meta },
+    taxa_qualificacao: { valor: taxaQualif, atingiu: taxaQualif >= METAS.taxa_qualificacao.meta },
+    visitas_semana: { valor: mediaVisitas, atingiu: mediaVisitas >= METAS.visitas_semana.meta },
+    propostas_semana: { valor: mediaPropostas, atingiu: mediaPropostas >= METAS.propostas_semana.meta },
+    tempo_lead_visita: { valor: mediaTempo, atingiu: mediaTempo <= METAS.tempo_lead_visita.meta },
+    custo_lead_qualif: { valor: custoLeadQualif, atingiu: custoLeadQualif <= METAS.custo_lead_qualif.meta },
+    receita_mensal: { valor: receitaMensal, atingiu: receitaMensal >= METAS.receita_mensal.meta }
+  };
+}
+
+function atualizarMetricas(ind) {
+  const container = document.getElementById("metricasContainer");
+  if (!ind) {
+    container.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:30px;color:#5c6675">Registre dados para ver os indicadores</div>`;
+    return;
+  }
+  container.innerHTML = Object.entries(METAS).map(([key, cfg]) => {
+    const d = ind[key];
+    if (!d) return "";
+    const cls = d.atingiu ? "ok" : (d.valor >= cfg.meta * 0.6 ? "warn" : "fail");
+    const statusText = d.atingiu ? "OK" : (d.valor >= cfg.meta * 0.6 ? "Atenção" : "Abaixo");
+    const valorDisplay = cfg.unidade === "R$" ? "R$ " + d.valor.toLocaleString("pt-BR") :
+                         cfg.unidade === "%" ? d.valor + "%" :
+                         d.valor + " " + cfg.unidade;
+    return `
+      <div class="metrica-card ${cls}">
+        <h3>${cfg.label}</h3>
+        <div class="valor">${valorDisplay}</div>
+        <div class="meta">Meta: ${cfg.unidade === "R$" ? "R$ " : ""}${cfg.meta}${cfg.unidade === "%" ? "%" : ""}${cfg.unidade === "dias" ? " dias" : ""}</div>
+        <span class="status ${cls}">${statusText}</span>
+      </div>
+    `;
+  }).join("");
+}
+
+function atualizarVeredito(ind, dados) {
+  const card = document.getElementById("vereditoCard");
+  const icon = document.getElementById("vereditoIcon");
+  const title = document.getElementById("vereditoTitle");
+  const text = document.getElementById("vereditoText");
+  const fill = document.getElementById("progressFill");
+  const label = document.getElementById("progressLabel");
+
+  if (!ind || dados.length === 0) {
+    card.className = "veredito";
+    icon.textContent = "&#128200;";
+    title.textContent = "Aguardando dados";
+    text.textContent = "Registre ao menos uma semana de indicadores.";
+    fill.style.width = "0%";
+    label.textContent = "0 de 7 indicadores OK";
+    return;
+  }
+
+  const total = 7;
+  let ok = 0;
+  Object.values(ind).forEach(v => { if (v.atingiu) ok++; });
+  const pct = Math.round((ok / total) * 100);
+
+  fill.style.width = pct + "%";
+  label.textContent = ok + " de " + total + " indicadores OK";
+
+  if (pct >= 80) {
+    card.className = "veredito ready";
+    icon.textContent = "&#128640;";
+    title.textContent = "Pronto para escalar!";
+    text.textContent = ok + " de 7 indicadores na meta. Você pode investir em tráfego pago, contratar assistente ou expandir ferramentas com segurança.";
+    fill.style.background = "var(--quente)";
+  } else if (pct >= 50) {
+    card.className = "veredito";
+    card.style.borderTopColor = "var(--morno)";
+    icon.textContent = "&#9888;";
+    title.textContent = "Quase lá — mantenha o foco";
+    text.textContent = ok + " de 7 indicadores na meta. Fortaleça os indicadores que estão abaixo antes de escalar.";
+    fill.style.background = "var(--morno)";
+  } else {
+    card.className = "veredito";
+    icon.textContent = "&#128204;";
+    title.textContent = "Hora de ajustar o processo";
+    text.textContent = "Apenas " + ok + " de 7 indicadores na meta. Foque em qualificação e follow-up antes de investir em escala.";
+    fill.style.background = "var(--frio)";
+  }
+}
+
+function atualizarTabela(dados) {
+  const tbody = document.getElementById("tabelaBody");
+  const hint = document.getElementById("dataHint");
+
+  if (dados.length === 0) {
+    tbody.innerHTML = "";
+    hint.style.display = "block";
+    return;
+  }
+  hint.style.display = "none";
+
+  tbody.innerHTML = dados.map(d => {
+    const taxa = d.leads > 0 ? Math.round((d.qualificados / d.leads) * 100) : 0;
+    const custo = d.qualificados > 0 ? (d.trafego / d.qualificados).toFixed(0) : "-";
+    const fonte = d.leads_auto ? " <span style='font-size:10px;color:#5c6675'>(auto)</span>" : "";
+    return `
+      <tr>
+        <td>${d.semana}</td>
+        <td>${d.leads}${fonte}</td>
+        <td>${d.qualificados}${fonte}</td>
+        <td>${taxa}%</td>
+        <td>${d.visitas}</td>
+        <td>${d.propostas}</td>
+        <td>${d.fechamentos}</td>
+        <td>R$ ${d.comissao.toFixed(0)}</td>
+        <td>R$ ${d.trafego.toFixed(0)}</td>
+        <td>${custo === "-" ? "-" : "R$ " + custo}</td>
+      </tr>
+    `;
+  }).reverse().join("");
+}
+
+function atualizarLeadsTable() {
+  const leads = getLeads();
+  const tbody = document.getElementById("leadsBody");
+  const hint = document.getElementById("leadsHint");
+  if (leads.length === 0) {
+    tbody.innerHTML = "";
+    if (hint) hint.style.display = "block";
+    return;
+  }
+  if (hint) hint.style.display = "none";
+  tbody.innerHTML = leads.slice().reverse().slice(0,20).map(l => {
+    const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
+    return `
+      <tr>
+        <td>${new Date(l.data).toLocaleDateString("pt-BR")}</td>
+        <td>${l.respostas.nome || "-"}</td>
+        <td><span class="badge ${tempCls}">${l.temperatura}</span></td>
+        <td>${l.score}/100</td>
+        <td>${l.respostas.finalidade || "-"}</td>
+        <td>${l.respostas.prazo || "-"}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function atualizarGrafico(dados) {
+  if (dados.length < 2) {
+    const ctx = document.getElementById("chartEvolucao").getContext("2d");
+    if (chartInstance) chartInstance.destroy();
+    chartInstance = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: dados.map(d => d.semana.slice(5)),
+        datasets: [
+          { label: "Qualificados", data: dados.map(d => d.qualificados), borderColor: "#D4A017", backgroundColor: "rgba(212,160,23,0.1)", fill: true, tension: 0.3 },
+          { label: "Visitas", data: dados.map(d => d.visitas), borderColor: "#1B2B4B", backgroundColor: "rgba(27,43,75,0.1)", fill: true, tension: 0.3 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: "bottom" } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+      }
+    });
+    return;
+  }
+
+  const labels = dados.map(d => d.semana.slice(5));
+  const ctx = document.getElementById("chartEvolucao").getContext("2d");
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Leads Qualificados",
+          data: dados.map(d => d.qualificados),
+          borderColor: "#D4A017",
+          backgroundColor: "rgba(212,160,23,0.1)",
+          fill: true,
+          tension: 0.3,
+          pointBackgroundColor: "#D4A017",
+          pointRadius: 4
+        },
+        {
+          label: "Visitas Realizadas",
+          data: dados.map(d => d.visitas),
+          borderColor: "#1B2B4B",
+          backgroundColor: "rgba(27,43,75,0.05)",
+          fill: true,
+          tension: 0.3,
+          pointBackgroundColor: "#1B2B4B",
+          pointRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "bottom", labels: { usePointStyle: true } }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { stepSize: 1 } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function atualizarTudo() {
+  let dados = getDados();
+  dados = mergeDadosCaptura(dados);
+  const ind = calcularIndicadores(dados);
+  atualizarMetricas(ind);
+  atualizarVeredito(ind, dados);
+  atualizarTabela(dados);
+  atualizarGrafico(dados);
+  atualizarLeadsTable();
+}
+
+atualizarTudo();
+</script>
+</body>
+</html>
