@@ -117,6 +117,8 @@ tbody tr:last-child td{border:none}
       <a href="captura.html" style="color:var(--accent);text-decoration:underline">&#128172; Capturar Lead</a>
       &middot;
       <a href="/" style="color:var(--accent);text-decoration:underline">&#127968; Mini-site</a>
+      &middot;
+      <span style="color:#b8c4d4">Total leads: <strong style="color:var(--accent)" id="totalLeadsCount">0</strong></span>
     </p>
   </div>
 
@@ -206,22 +208,28 @@ tbody tr:last-child td{border:none}
     <div class="data-hint" id="dataHint">Nenhum registro ainda. Adicione sua primeira semana acima.</div>
   </div>
 
-  <div class="section-title">Leads Capturados pela IA <span class="badge">ÚLTIMOS 20</span></div>
+  <div class="section-title">Leads Capturados pela IA <span class="badge">REGISTROS</span></div>
   <div class="table-section">
     <table>
       <thead>
         <tr>
           <th>Data</th>
           <th>Nome</th>
-          <th>Temperatura</th>
+          <th>Temp.</th>
           <th>Score</th>
-          <th>Finalidade</th>
-          <th>Prazo</th>
+          <th>Contato</th>
+          <th>Ações</th>
         </tr>
       </thead>
       <tbody id="leadsBody"></tbody>
     </table>
     <div class="data-hint" id="leadsHint">Nenhum lead capturado ainda. Os leads da página de Captura aparecerão aqui automaticamente.</div>
+  </div>
+
+  <!-- OVERLAY + PAINEL DE PERFIL -->
+  <div id="leadProfileOverlay" onclick="fecharPerfilLead()" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:999"></div>
+  <div id="leadProfilePanel" style="display:none;position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:var(--white);border-radius:var(--radius);padding:28px;max-width:560px;width:90%;max-height:80vh;overflow-y:auto;z-index:1000;box-shadow:0 10px 40px rgba(0,0,0,0.3)">
+    <div id="profileContent"></div>
   </div>
 
   <div class="section-title">Regras de Decisão <span class="badge">QUANDO ESCALAR</span></div>
@@ -431,7 +439,7 @@ function atualizarVeredito(ind, dados) {
 
   if (!ind || dados.length === 0) {
     card.className = "veredito";
-    icon.textContent = "&#128200;";
+    icon.textContent = "📊";
     title.textContent = "Aguardando dados";
     text.textContent = "Registre ao menos uma semana de indicadores.";
     fill.style.width = "0%";
@@ -449,20 +457,20 @@ function atualizarVeredito(ind, dados) {
 
   if (pct >= 80) {
     card.className = "veredito ready";
-    icon.textContent = "&#128640;";
+    icon.textContent = "🚀";
     title.textContent = "Pronto para escalar!";
     text.textContent = ok + " de 7 indicadores na meta. Você pode investir em tráfego pago, contratar assistente ou expandir ferramentas com segurança.";
     fill.style.background = "var(--quente)";
   } else if (pct >= 50) {
     card.className = "veredito";
     card.style.borderTopColor = "var(--morno)";
-    icon.textContent = "&#9888;";
+    icon.textContent = "⚠️";
     title.textContent = "Quase lá — mantenha o foco";
     text.textContent = ok + " de 7 indicadores na meta. Fortaleça os indicadores que estão abaixo antes de escalar.";
     fill.style.background = "var(--morno)";
   } else {
     card.className = "veredito";
-    icon.textContent = "&#128204;";
+    icon.textContent = "📌";
     title.textContent = "Hora de ajustar o processo";
     text.textContent = "Apenas " + ok + " de 7 indicadores na meta. Foque em qualificação e follow-up antes de investir em escala.";
     fill.style.background = "var(--frio)";
@@ -501,6 +509,49 @@ function atualizarTabela(dados) {
   }).reverse().join("");
 }
 
+function excluirLead(index) {
+  if (!confirm("Excluir este lead?")) return;
+  let leads = getLeads();
+  leads.splice(index, 1);
+  localStorage.setItem("alan_leads", JSON.stringify(leads));
+  atualizarLeadsTable();
+  atualizarTudo();
+}
+
+function verPerfilLead(index) {
+  const leads = getLeads();
+  const l = leads[leads.length - 1 - index];
+  const panel = document.getElementById("leadProfilePanel");
+  const overlay = document.getElementById("leadProfileOverlay");
+  if (!l) return;
+  const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
+  document.getElementById("profileContent").innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <h3 style="color:var(--primary);font-size:18px;font-weight:700">${l.respostas.nome || "Sem nome"}</h3>
+      <span class="badge ${tempCls}" style="font-size:13px;padding:5px 14px">${l.temperatura} · ${l.score}/100</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${Object.entries(l.respostas).map(([k,v]) => `
+        <div style="background:#f8f9fa;border-radius:6px;padding:10px 12px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;color:#5c6675">${k}</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);margin-top:2px">${v}</div>
+        </div>
+      `).join("")}
+    </div>
+    <div style="margin-top:14px;font-size:12px;color:#5c6675">
+      Capturado em: ${new Date(l.data).toLocaleString("pt-BR")}
+    </div>
+    <button onclick="fecharPerfilLead()" style="margin-top:16px;width:100%;padding:12px;background:var(--primary);color:var(--white);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">Fechar</button>
+  `;
+  panel.style.display = "block";
+  overlay.style.display = "block";
+}
+
+function fecharPerfilLead() {
+  document.getElementById("leadProfilePanel").style.display = "none";
+  document.getElementById("leadProfileOverlay").style.display = "none";
+}
+
 function atualizarLeadsTable() {
   const leads = getLeads();
   const tbody = document.getElementById("leadsBody");
@@ -511,16 +562,22 @@ function atualizarLeadsTable() {
     return;
   }
   if (hint) hint.style.display = "none";
-  tbody.innerHTML = leads.slice().reverse().slice(0,20).map(l => {
+  const totalEl = document.getElementById("totalLeadsCount");
+  if (totalEl) totalEl.textContent = leads.length;
+
+  tbody.innerHTML = leads.slice().reverse().slice(0,50).map((l, i) => {
     const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
+    const contato = l.respostas.whatsapp || l.respostas.email || "-";
     return `
       <tr>
         <td>${new Date(l.data).toLocaleDateString("pt-BR")}</td>
-        <td>${l.respostas.nome || "-"}</td>
+        <td><a href="#" onclick="verPerfilLead(${i});return false" style="color:var(--secondary);font-weight:600;text-decoration:underline">${l.respostas.nome || "-"}</a></td>
         <td><span class="badge ${tempCls}">${l.temperatura}</span></td>
         <td>${l.score}/100</td>
-        <td>${l.respostas.finalidade || "-"}</td>
-        <td>${l.respostas.prazo || "-"}</td>
+        <td style="font-size:12px">${contato}</td>
+        <td>
+          <button onclick="excluirLead(${leads.length - 1 - i})" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:16px;padding:2px 6px" title="Excluir lead">🗑️</button>
+        </td>
       </tr>
     `;
   }).join("");
