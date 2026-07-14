@@ -518,33 +518,100 @@ function excluirLead(index) {
   atualizarTudo();
 }
 
+var _editLeadIndex = -1;
+
 function verPerfilLead(index) {
   const leads = getLeads();
-  const l = leads[leads.length - 1 - index];
+  const idx = leads.length - 1 - index;
+  const l = leads[idx];
   const panel = document.getElementById("leadProfilePanel");
   const overlay = document.getElementById("leadProfileOverlay");
   if (!l) return;
+  _editLeadIndex = idx;
   const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
-  document.getElementById("profileContent").innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h3 style="color:var(--primary);font-size:18px;font-weight:700">${l.respostas.nome || "Sem nome"}</h3>
-      <span class="badge ${tempCls}" style="font-size:13px;padding:5px 14px">${l.temperatura} · ${l.score}/100</span>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-      ${Object.entries(l.respostas).map(([k,v]) => `
-        <div style="background:#f8f9fa;border-radius:6px;padding:10px 12px">
-          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;color:#5c6675">${k}</div>
-          <div style="font-size:14px;font-weight:600;color:var(--text);margin-top:2px">${v}</div>
-        </div>
-      `).join("")}
-    </div>
-    <div style="margin-top:14px;font-size:12px;color:#5c6675">
-      Capturado em: ${new Date(l.data).toLocaleString("pt-BR")}
-    </div>
-    <button onclick="fecharPerfilLead()" style="margin-top:16px;width:100%;padding:12px;background:var(--primary);color:var(--white);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">Fechar</button>
-  `;
+  renderPerfil(l, false, tempCls);
   panel.style.display = "block";
   overlay.style.display = "block";
+}
+
+function renderPerfil(l, editing, tempCls) {
+  const entries = Object.entries(l.respostas);
+  const score = l.score;
+  const dataStr = new Date(l.data).toLocaleString("pt-BR");
+  const temp = l.temperatura;
+
+  if (!editing) {
+    document.getElementById("profileContent").innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 style="color:var(--primary);font-size:18px;font-weight:700">${l.respostas.nome || "Sem nome"}</h3>
+        <span class="badge ${tempCls}" style="font-size:13px;padding:5px 14px">${temp} · ${score}/100</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${entries.map(([k,v]) => `
+          <div style="background:#f8f9fa;border-radius:6px;padding:10px 12px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;color:#5c6675">${k}</div>
+            <div style="font-size:14px;font-weight:600;color:var(--text);margin-top:2px">${v}</div>
+          </div>
+        `).join("")}
+      </div>
+      <div style="margin-top:14px;font-size:12px;color:#5c6675">Capturado em: ${dataStr}</div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button onclick="editarPerfilLead()" style="flex:1;padding:12px;background:var(--accent);color:var(--primary);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">✏️ Editar</button>
+        <button onclick="fecharPerfilLead()" style="flex:1;padding:12px;background:var(--primary);color:var(--white);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">Fechar</button>
+      </div>
+    `;
+  } else {
+    document.getElementById("profileContent").innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <h3 style="color:var(--primary);font-size:18px;font-weight:700">✏️ Editando</h3>
+        <span class="badge ${tempCls}" style="font-size:13px;padding:5px 14px">${temp} · ${score}/100</span>
+      </div>
+      <div id="editGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        ${entries.map(([k,v]) => `
+          <div style="background:#f8f9fa;border-radius:6px;padding:10px 12px">
+            <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;color:#5c6675;margin-bottom:4px">${k}</div>
+            <input id="edit_${k}" value="${(v || '').replace(/"/g,'&quot;')}" style="width:100%;padding:8px 10px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;font-family:inherit;outline:none">
+          </div>
+        `).join("")}
+      </div>
+      <div style="margin-top:14px;font-size:12px;color:#5c6675">Capturado em: ${dataStr}</div>
+      <div style="display:flex;gap:8px;margin-top:16px">
+        <button onclick="salvarEdicaoLead()" style="flex:1;padding:12px;background:var(--quente);color:var(--white);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">💾 Salvar</button>
+        <button onclick="cancelarEdicaoLead()" style="flex:1;padding:12px;background:#eee;color:var(--text);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">Cancelar</button>
+      </div>
+    `;
+  }
+}
+
+function editarPerfilLead() {
+  const leads = getLeads();
+  const l = leads[_editLeadIndex];
+  if (!l) return;
+  const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
+  renderPerfil(l, true, tempCls);
+}
+
+function cancelarEdicaoLead() {
+  const leads = getLeads();
+  const l = leads[_editLeadIndex];
+  if (!l) return;
+  const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
+  renderPerfil(l, false, tempCls);
+}
+
+function salvarEdicaoLead() {
+  let leads = getLeads();
+  const l = leads[_editLeadIndex];
+  if (!l) return;
+  Object.keys(l.respostas).forEach(k => {
+    const inp = document.getElementById("edit_" + k);
+    if (inp) l.respostas[k] = inp.value;
+  });
+  leads[_editLeadIndex] = l;
+  localStorage.setItem("alan_leads", JSON.stringify(leads));
+  const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
+  renderPerfil(l, false, tempCls);
+  atualizarLeadsTable();
 }
 
 function fecharPerfilLead() {
