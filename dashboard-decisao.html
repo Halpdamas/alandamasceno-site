@@ -87,15 +87,18 @@ tbody tr:last-child{border:none}
 .chart-card .desc{font-size:11px;color:#5c6675;margin-bottom:10px}
 .chart-card canvas{max-height:200px}
 
-/* TABELA REGRAS */
+/* REGRAS DE DECISÃO — mobile cards */
 .regras{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px 16px;margin-bottom:16px}
 .regras h3{font-size:14px;font-weight:700;color:var(--primary);margin-bottom:10px}
-.regras table{font-size:11px}
-.regras tbody td{padding:6px 8px;display:table-cell;text-align:left}
-.regras tbody td:before{content:none}
-.regras tbody tr{display:table-row;padding:0;border:none}
-.regras thead{display:table-header-group}
-.regras thead th{font-size:10px;padding:6px 8px;background:var(--primary);color:var(--white);text-align:left;font-weight:600;text-transform:uppercase;letter-spacing:0.2px}
+.regras table{display:none}
+.regras-cards{display:grid;grid-template-columns:1fr;gap:8px}
+.regras-card{background:#f8f9fa;border-radius:8px;padding:12px;border-left:3px solid var(--accent)}
+.regras-card .rc-ind{font-size:13px;font-weight:700;color:var(--primary)}
+.regras-card .rc-meta{font-size:12px;color:var(--text);margin-top:2px}
+.regras-card .rc-meta strong{color:var(--accent)}
+.regras-card .rc-porq{font-size:11px;color:#5c6675;margin-top:4px;padding-top:4px;border-top:1px solid #e0e0e0}
+.regras-card .rc-acao{font-size:11px;color:var(--primary);margin-top:3px;font-weight:600}
+.regras-card .rc-acao::before{content:"→ "}
 
 .data-hint{font-size:11px;color:#5c6675;margin-top:6px;text-align:center}
 
@@ -111,9 +114,16 @@ tbody tr:last-child{border:none}
   .form-row-btn button{flex:initial;min-width:auto}
   .chart-card{padding:20px 22px}
   .chart-card canvas{max-height:260px}
-  .regras{padding:20px 24px}
   .veredito{padding:24px 28px}
   .veredito .icon{font-size:42px}
+  .regras{padding:20px 24px}
+  .regras table{display:table;font-size:12px}
+  .regras-cards{display:none}
+  .regras thead th{font-size:10px;padding:6px 10px;background:var(--primary);color:var(--white);text-align:left;font-weight:600;text-transform:uppercase;letter-spacing:0.2px}
+  .regras tbody td{padding:8px 10px;border-bottom:1px solid #f0f0f0;display:table-cell;text-align:left;font-size:12px}
+  .regras tbody td:before{content:none}
+  .regras tbody tr{display:table-row;padding:0;border:none}
+  .regras tbody tr:hover{background:#f8f9fb}
 
   /* tablets desfaz table mobile */
   thead{display:table-header-group}
@@ -309,6 +319,50 @@ tbody tr:last-child{border:none}
         </tr>
       </tbody>
     </table>
+    <div class="regras-cards">
+      <div class="regras-card">
+        <div class="rc-ind">Leads qualif./semana</div>
+        <div class="rc-meta"><strong>Meta:</strong> ≥ 5 por 3 semanas</div>
+        <div class="rc-porq">Mostra demanda consistente</div>
+        <div class="rc-acao">Ativar tráfego pago leve</div>
+      </div>
+      <div class="regras-card">
+        <div class="rc-ind">Taxa de qualificação</div>
+        <div class="rc-meta"><strong>Meta:</strong> ≥ 15%</div>
+        <div class="rc-porq">Funil está saudável na entrada</div>
+        <div class="rc-acao">Antes era 0,02% — melhoria de processo</div>
+      </div>
+      <div class="regras-card">
+        <div class="rc-ind">Visitas/semana</div>
+        <div class="rc-meta"><strong>Meta:</strong> ≥ 3 por 2 semanas</div>
+        <div class="rc-porq">Lead está saindo do WhatsApp</div>
+        <div class="rc-acao">Contratar assistente de visitas</div>
+      </div>
+      <div class="regras-card">
+        <div class="rc-ind">Propostas/semana</div>
+        <div class="rc-meta"><strong>Meta:</strong> ≥ 2 por 3 semanas</div>
+        <div class="rc-porq">Funil avançado funciona</div>
+        <div class="rc-acao">Aumentar investimento em mídia</div>
+      </div>
+      <div class="regras-card">
+        <div class="rc-ind">Tempo lead → visita</div>
+        <div class="rc-meta"><strong>Meta:</strong> ≤ 7 dias</div>
+        <div class="rc-porq">Velocidade de atendimento</div>
+        <div class="rc-acao">Automatizar qualificação (Pilar 2)</div>
+      </div>
+      <div class="regras-card">
+        <div class="rc-ind">Custo por lead qualif.</div>
+        <div class="rc-meta"><strong>Meta:</strong> ≤ R$ 50</div>
+        <div class="rc-porq">ROI positivo no tráfego</div>
+        <div class="rc-acao">Escalar investimento</div>
+      </div>
+      <div class="regras-card">
+        <div class="rc-ind">Receita mensal</div>
+        <div class="rc-meta"><strong>Meta:</strong> ≥ R$ 5.000</div>
+        <div class="rc-porq">Operação se sustenta</div>
+        <div class="rc-acao">Contratar equipe / ferramentas</div>
+      </div>
+    </div>
   </div>
 
   <div class="footer">Dashboard de Decisão — Alan Damasceno | Imóveis Fortaleza - CE — Dados salvos no navegador (localStorage)</div>
