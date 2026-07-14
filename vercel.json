@@ -1,7 +1,9 @@
 {
   "rewrites": [
     { "source": "/", "destination": "/alan-damasceno.html" },
-    { "source": "/alan", "destination": "/alan.html" }
+    { "source": "/alan", "destination": "/alan.html" },
+    { "source": "/lead", "destination": "/lead.html" },
+    { "source": "/dash", "destination": "/dash.html" }
   ],
   "headers": [
     {
