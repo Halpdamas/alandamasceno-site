@@ -189,6 +189,9 @@ const PERGUNTAS = [
   }
 ];
 
+// COLE A URL DO GOOGLE APPS SCRIPT AQUI (instruções no arquivo GoogleSheets_AppsScript.gs)
+// const SCRIPT_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
+
 const SCORE_MAP = {
   finalidade: { "Moradia": 20, "Investimento": 25, "Ainda não decidi": 5 },
   orcamento: { "Até R$ 300 mil": 5, "R$ 300 mil a R$ 600 mil": 15, "R$ 600 mil a R$ 1 milhão": 25, "Acima de R$ 1 milhão": 30 },
@@ -370,7 +373,25 @@ function salvarLead(score, temp) {
     });
     localStorage.setItem("alan_leads", JSON.stringify(historico));
     sincronizarDashboard(score);
+    enviarParaPlanilha(score, temp);
     atualizarContadores();
+  } catch(e) {}
+}
+
+function enviarParaPlanilha(score, temp) {
+  if (typeof SCRIPT_URL === "undefined" || !SCRIPT_URL.startsWith("https://")) return;
+  try {
+    const payload = {
+      respostas: respostas,
+      score: score,
+      temperatura: temp
+    };
+    fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(payload)
+    }).catch(() => {});
   } catch(e) {}
 }
 

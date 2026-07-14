@@ -119,6 +119,8 @@ tbody tr:last-child td{border:none}
       <a href="/" style="color:var(--accent);text-decoration:underline">&#127968; Mini-site</a>
       &middot;
       <span style="color:#b8c4d4">Total leads: <strong style="color:var(--accent)" id="totalLeadsCount">0</strong></span>
+      &middot;
+      <span id="cloudBadge" style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;background:#eee;color:#5c6675">🔄 Sincronizando...</span>
     </p>
   </div>
 
@@ -312,10 +314,46 @@ function getDados() {
   } catch(e) { return []; }
 }
 
+// COLE A URL DO GOOGLE APPS SCRIPT AQUI (instruções no arquivo GoogleSheets_AppsScript.gs)
+// const SCRIPT_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
+
+var _leadsCloud = null;
+
 function getLeads() {
+  if (_leadsCloud) return _leadsCloud;
   try {
     return JSON.parse(localStorage.getItem("alan_leads") || "[]");
   } catch(e) { return []; }
+}
+
+function carregarLeadsDaNuvem() {
+  if (typeof SCRIPT_URL === "undefined" || !SCRIPT_URL) return;
+  fetch(SCRIPT_URL)
+    .then(r => r.json())
+    .then(data => {
+      if (data && data.leads && data.leads.length > 0) {
+        _leadsCloud = data.leads;
+        // faz merge com localStorage para nao perder dados locais
+        try {
+          const locais = JSON.parse(localStorage.getItem("alan_leads") || "[]");
+          if (locais.length > 0) {
+            const cloudDatas = new Set(data.leads.map(l => l.data));
+            const novos = locais.filter(l => !cloudDatas.has(l.data));
+            if (novos.length > 0) {
+              _leadsCloud = [..._leadsCloud, ...novos];
+            }
+          }
+        } catch(e) {}
+        atualizarLeadsTable();
+        atualizarTudo();
+        const badge = document.getElementById("cloudBadge");
+        if (badge) { badge.textContent = "☁️ Nuvem ativa"; badge.style.background = "var(--quente)"; badge.style.color = "#fff"; }
+      }
+    })
+    .catch(() => {
+      const badge = document.getElementById("cloudBadge");
+      if (badge) { badge.textContent = "💾 Local"; badge.style.background = "var(--morno)"; badge.style.color = "#fff"; }
+    });
 }
 
 function mergeDadosCaptura(dados) {
@@ -744,6 +782,7 @@ function atualizarTudo() {
 }
 
 atualizarTudo();
+carregarLeadsDaNuvem();
 </script>
 </body>
 </html>
