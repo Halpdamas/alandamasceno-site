@@ -1,6 +1,4 @@
-name = "clarity-finance"
-compatibility_date = "2026-07-14"
-
-[site]
-bucket = "."
-include = ["clarity2.html"]
+# Config para Cloudflare Pages (não Workers)
+# Deploy via dashboard: Pages > Create > Connect to Git
+# Build: framework=None, build output=.
+# Ou via CLI: npx wrangler pages deploy . --project-name clarity-finance-2
