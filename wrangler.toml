@@ -1,0 +1,6 @@
+name = "clarity-finance"
+compatibility_date = "2026-07-14"
+
+[site]
+bucket = "."
+include = ["clarity2.html"]
