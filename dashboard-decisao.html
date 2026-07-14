@@ -217,8 +217,8 @@ tbody tr:last-child td{border:none}
           <th>Nome</th>
           <th>Temp.</th>
           <th>Score</th>
-          <th>Contato</th>
-          <th>Ações</th>
+          <th>Contato + Atalhos</th>
+          <th>Excluir</th>
         </tr>
       </thead>
       <tbody id="leadsBody"></tbody>
@@ -541,6 +541,10 @@ function renderPerfil(l, editing, tempCls) {
   const temp = l.temperatura;
 
   if (!editing) {
+    const wpp = l.respostas.whatsapp || "";
+    const email = l.respostas.email || "";
+    const wppLink = wpp ? `https://wa.me/55${wpp.replace(/\D/g,'')}?text=Ol%C3%A1%20${encodeURIComponent(l.respostas.nome||'')}!%20Vi%20seu%20contato%20aqui%20no%20meu%20dashboard%20e%20gostaria%20de%20saber%20mais%20sobre%20im%C3%B3veis%20em%20Fortaleza.` : "";
+    const emailLink = email ? `mailto:${email}?subject=Im%C3%B3veis%20Fortaleza%20-%20Alan%20Damasceno` : "";
     document.getElementById("profileContent").innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
         <h3 style="color:var(--primary);font-size:18px;font-weight:700">${l.respostas.nome || "Sem nome"}</h3>
@@ -555,7 +559,11 @@ function renderPerfil(l, editing, tempCls) {
         `).join("")}
       </div>
       <div style="margin-top:14px;font-size:12px;color:#5c6675">Capturado em: ${dataStr}</div>
-      <div style="display:flex;gap:8px;margin-top:16px">
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        ${wpp ? `<a href="${wppLink}" target="_blank" style="flex:1;min-width:120px;text-align:center;padding:10px;background:#25D366;color:#fff;border-radius:var(--radius);font-weight:600;font-size:13px;text-decoration:none">💬 WhatsApp</a>` : ""}
+        ${email ? `<a href="${emailLink}" target="_blank" style="flex:1;min-width:120px;text-align:center;padding:10px;background:var(--secondary);color:#fff;border-radius:var(--radius);font-weight:600;font-size:13px;text-decoration:none">✉️ E-mail</a>` : ""}
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
         <button onclick="editarPerfilLead()" style="flex:1;padding:12px;background:var(--accent);color:var(--primary);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">✏️ Editar</button>
         <button onclick="fecharPerfilLead()" style="flex:1;padding:12px;background:var(--primary);color:var(--white);border:none;border-radius:var(--radius);font-weight:600;cursor:pointer;font-family:inherit">Fechar</button>
       </div>
@@ -634,14 +642,22 @@ function atualizarLeadsTable() {
 
   tbody.innerHTML = leads.slice().reverse().slice(0,50).map((l, i) => {
     const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
-    const contato = l.respostas.whatsapp || l.respostas.email || "-";
+    const wpp = l.respostas.whatsapp || "";
+    const email = l.respostas.email || "";
+    const wppLink = wpp ? `https://wa.me/55${wpp.replace(/\D/g,'')}?text=Ol%C3%A1%20${encodeURIComponent(l.respostas.nome||'')}!%20Vi%20seu%20contato%20no%20meu%20dashboard.` : "";
+    const emailLink = email ? `mailto:${email}?subject=Im%C3%B3veis%20Fortaleza%20-%20Alan%20Damasceno` : "";
     return `
       <tr>
         <td>${new Date(l.data).toLocaleDateString("pt-BR")}</td>
         <td><a href="#" onclick="verPerfilLead(${i});return false" style="color:var(--secondary);font-weight:600;text-decoration:underline">${l.respostas.nome || "-"}</a></td>
         <td><span class="badge ${tempCls}">${l.temperatura}</span></td>
         <td>${l.score}/100</td>
-        <td style="font-size:12px">${contato}</td>
+        <td style="font-size:12px;display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          ${wpp ? `<a href="${wppLink}" target="_blank" title="Enviar WhatsApp" style="display:inline-flex;align-items:center;gap:4px;background:#25D366;color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap">💬 WhatsApp</a>` : ""}
+          ${email ? `<a href="${emailLink}" target="_blank" title="Enviar e-mail" style="display:inline-flex;align-items:center;gap:4px;background:var(--secondary);color:#fff;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap">✉️ E-mail</a>` : ""}
+          ${!wpp && !email ? "-" : ""}
+          <span style="font-size:11px;color:#5c6675">${wpp ? wpp : ""}${email ? " / " + email : ""}</span>
+        </td>
         <td>
           <button onclick="excluirLead(${leads.length - 1 - i})" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:16px;padding:2px 6px" title="Excluir lead">🗑️</button>
         </td>
