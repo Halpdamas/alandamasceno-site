@@ -318,6 +318,7 @@ function getDados() {
 // const SCRIPT_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
 
 var _leadsCloud = null;
+var _dashboardCloud = null;
 
 function getLeads() {
   if (_leadsCloud) return _leadsCloud;
@@ -326,14 +327,32 @@ function getLeads() {
   } catch(e) { return []; }
 }
 
-function carregarLeadsDaNuvem() {
-  if (typeof SCRIPT_URL === "undefined" || !SCRIPT_URL) return;
-  fetch(SCRIPT_URL)
+function getDados() {
+  if (_dashboardCloud) return _dashboardCloud;
+  try {
+    return JSON.parse(localStorage.getItem("alan_dashboard") || "[]");
+  } catch(e) { return []; }
+}
+
+function setCloudBadge(texto, cor) {
+  const badge = document.getElementById("cloudBadge");
+  if (badge) { badge.textContent = texto; badge.style.background = cor; badge.style.color = "#fff"; }
+}
+
+function carregarDadosDaNuvem() {
+  if (typeof SCRIPT_URL === "undefined" || !SCRIPT_URL) {
+    setCloudBadge("💾 Local", "var(--morno)");
+    return;
+  }
+  setCloudBadge("🔄 Sincronizando...", "var(--morno)");
+
+  // Carrega leads
+  fetch(SCRIPT_URL + "?tipo=leads")
     .then(r => r.json())
     .then(data => {
       if (data && data.leads && data.leads.length > 0) {
         _leadsCloud = data.leads;
-        // faz merge com localStorage para nao perder dados locais
+
         try {
           const locais = JSON.parse(localStorage.getItem("alan_leads") || "[]");
           if (locais.length > 0) {
@@ -344,16 +363,48 @@ function carregarLeadsDaNuvem() {
             }
           }
         } catch(e) {}
-        atualizarLeadsTable();
-        atualizarTudo();
-        const badge = document.getElementById("cloudBadge");
-        if (badge) { badge.textContent = "☁️ Nuvem ativa"; badge.style.background = "var(--quente)"; badge.style.color = "#fff"; }
       }
+
+      // Carrega dashboard
+      return fetch(SCRIPT_URL + "?tipo=dashboard");
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data && data.registros && data.registros.length > 0) {
+        _dashboardCloud = data.registros;
+
+        try {
+          const locais = JSON.parse(localStorage.getItem("alan_dashboard") || "[]");
+          if (locais.length > 0) {
+            const cloudSemanas = new Set(data.registros.map(r => r.semana));
+            const novos = locais.filter(r => !cloudSemanas.has(r.semana));
+            if (novos.length > 0) {
+              _dashboardCloud = [..._dashboardCloud, ...novos];
+              // Re-envia os novos para a nuvem
+              novos.forEach(r => enviarDashboardParaNuvem(r));
+            }
+          }
+        } catch(e) {}
+      }
+
+      setCloudBadge("☁️ Nuvem ativa", "var(--quente)");
+      atualizarTudo();
     })
     .catch(() => {
-      const badge = document.getElementById("cloudBadge");
-      if (badge) { badge.textContent = "💾 Local"; badge.style.background = "var(--morno)"; badge.style.color = "#fff"; }
+      setCloudBadge("💾 Local", "var(--morno)");
+      atualizarTudo();
     });
+}
+
+function enviarDashboardParaNuvem(entry) {
+  if (typeof SCRIPT_URL === "undefined" || !SCRIPT_URL) return;
+  const payload = { tipo: "dashboard", ...entry };
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "text/plain" },
+    body: JSON.stringify(payload)
+  }).catch(() => {});
 }
 
 function mergeDadosCaptura(dados) {
@@ -380,6 +431,10 @@ function mergeDadosCaptura(dados) {
 
 function salvarDados(dados) {
   localStorage.setItem("alan_dashboard", JSON.stringify(dados));
+  if (_dashboardCloud) {
+    // Atualiza o cache cloud para incluir novos dados
+    _dashboardCloud = dados;
+  }
 }
 
 function registrarSemana() {
@@ -398,6 +453,7 @@ function registrarSemana() {
   let dados = getDados();
   dados.push(entry);
   salvarDados(dados);
+  enviarDashboardParaNuvem(entry);
   atualizarTudo();
   limparForm();
 }
@@ -782,7 +838,7 @@ function atualizarTudo() {
 }
 
 atualizarTudo();
-carregarLeadsDaNuvem();
+carregarDadosDaNuvem();
 </script>
 </body>
 </html>

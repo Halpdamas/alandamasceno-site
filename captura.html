@@ -382,6 +382,7 @@ function enviarParaPlanilha(score, temp) {
   if (typeof SCRIPT_URL === "undefined" || !SCRIPT_URL.startsWith("https://")) return;
   try {
     const payload = {
+      tipo: "lead",
       respostas: respostas,
       score: score,
       temperatura: temp
