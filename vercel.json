@@ -1,11 +1,7 @@
 {
   "rewrites": [
-    { "source": "/", "destination": "/alan-damasceno.html" }
-  ],
-  "redirects": [
-    { "source": "/alan", "destination": "/", "permanent": true },
-    { "source": "/lead", "destination": "/captura.html", "permanent": true },
-    { "source": "/dash", "destination": "/dashboard-decisao.html", "permanent": true }
+    { "source": "/", "destination": "/alan-damasceno.html" },
+    { "source": "/alan", "destination": "/alan.html" }
   ],
   "headers": [
     {
