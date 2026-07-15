@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
 <style>
 :root {
   --primary: #1B2B4B;
@@ -70,6 +72,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-
 .btn-add:active{background:#c08e10}
 .btn-reset{background:#eee;color:#5c6675}
 .btn-reset:active{background:#ddd}
+.export-btn-group{display:flex;gap:8px;flex-wrap:wrap;padding:16px;background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px}
+.export-btn-group button{flex:1;min-width:120px;padding:11px 18px;border:none;border-radius:var(--radius);font-weight:600;font-size:13px;cursor:pointer;font-family:inherit;transition:all 0.2s}
 
 /* TABELA — mobile cards */
 .table-section{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
@@ -215,6 +219,12 @@ tbody tr:last-child{border:none}
     <h3>Leads Qualificados vs Visitas</h3>
     <div class="desc">Acompanhe a evolução ao longo das semanas</div>
     <canvas id="chartEvolucao"></canvas>
+  </div>
+
+  <div class="section-title">Exportar Dados <span class="badge">PDF / EXCEL</span></div>
+  <div class="export-btn-group">
+    <button onclick="exportarPDF()" style="background:var(--accent);color:var(--primary)">📄 Exportar PDF</button>
+    <button onclick="exportarExcel()" style="background:var(--quente);color:var(--white)">📊 Exportar Excel</button>
   </div>
 
   <div class="section-title">Histórico de Registros <span class="badge">TABELA</span></div>
@@ -880,6 +890,48 @@ function atualizarTudo(dados, leads) {
 }
 
 carregarDadosDaNuvem();
+
+function exportarExcel() {
+  const dados = _dashboardCache || [];
+  const leads = _leadsCache || [];
+  if (dados.length === 0 && leads.length === 0) { alert("Nenhum dado para exportar."); return; }
+
+  const wb = XLSX.utils.book_new();
+
+  // Aba Dashboard
+  if (dados.length > 0) {
+    const wsData = [["Semana","Leads","Qualificados","Visitas","Propostas","Fechamentos","Comissao","Trafego","Tempo"]];
+    dados.forEach(d => wsData.push([d.semana, d.leads, d.qualificados, d.visitas, d.propostas, d.fechamentos, d.comissao, d.trafego, d.tempo]));
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, "Dashboard");
+  }
+
+  // Aba Leads
+  if (leads.length > 0) {
+    const wsData = [["Data","Nome","Finalidade","Orcamento","Pagamento","Bairro","Prazo","WhatsApp","Email","Score","Temperatura"]];
+    leads.forEach(l => wsData.push([
+      new Date(l.created_at).toLocaleString("pt-BR"),
+      l.nome, l.finalidade, l.orcamento, l.pagamento,
+      l.bairro, l.prazo, l.whatsapp, l.email, l.score, l.temperatura
+    ]));
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    XLSX.utils.book_append_sheet(wb, ws, "Leads");
+  }
+
+  XLSX.writeFile(wb, "AlanDamasceno_Dados.xlsx");
+}
+
+function exportarPDF() {
+  const element = document.querySelector(".wrap");
+  const opt = {
+    margin: [10, 10],
+    filename: "AlanDamasceno_Dashboard.pdf",
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, logging: false },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+  };
+  html2pdf().set(opt).from(element).save();
+}
 </script>
 </body>
 </html>
