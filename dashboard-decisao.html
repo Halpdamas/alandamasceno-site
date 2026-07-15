@@ -365,10 +365,13 @@ tbody tr:last-child{border:none}
     </div>
   </div>
 
-  <div class="footer">Dashboard de Decisão — Alan Damasceno | Imóveis Fortaleza - CE — Dados salvos no navegador (localStorage)</div>
+  <div class="footer">Dashboard de Decisão — Alan Damasceno | Imóveis Fortaleza - CE — Dados no Supabase Cloud</div>
 </div>
 
 <script>
+const SUPABASE_URL = "https://qukcsvmtokjgldkatysp.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1a2Nzdm10b2tqZ2xka2F0eXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxMTQ0ODQsImV4cCI6MjA5OTY5MDQ4NH0.YJGE9qlgyLz1jWyNHpkQqziqiFcwHRVELLuMJTTpUcw";
+
 const METAS = {
   leads_qualif_semana: { meta: 5, label: "Leads qualif./semana", unidade: "lead" },
   taxa_qualificacao: { meta: 15, label: "Taxa de qualificação", unidade: "%" },
@@ -380,31 +383,31 @@ const METAS = {
 };
 
 let chartInstance = null;
+var _leadsCache = null;
+var _dashboardCache = null;
 
-function getDados() {
-  try {
-    return JSON.parse(localStorage.getItem("alan_dashboard") || "[]");
-  } catch(e) { return []; }
+function supabaseHeaders() {
+  return {
+    "apikey": SUPABASE_KEY,
+    "Authorization": `Bearer ${SUPABASE_KEY}`,
+    "Content-Type": "application/json"
+  };
 }
 
-// COLE A URL DO GOOGLE APPS SCRIPT AQUI (instruções no arquivo GoogleSheets_AppsScript.gs)
-// const SCRIPT_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
-
-var _leadsCloud = null;
-var _dashboardCloud = null;
-
-function getLeads() {
-  if (_leadsCloud) return _leadsCloud;
-  try {
-    return JSON.parse(localStorage.getItem("alan_leads") || "[]");
-  } catch(e) { return []; }
+function getLeads(force) {
+  if (_leadsCache && !force) return Promise.resolve(_leadsCache);
+  return fetch(`${SUPABASE_URL}/rest/v1/leads?select=*&order=created_at.desc`, { headers: supabaseHeaders() })
+    .then(r => r.json())
+    .then(data => { _leadsCache = data || []; return _leadsCache; })
+    .catch(() => { _leadsCache = []; return []; });
 }
 
-function getDados() {
-  if (_dashboardCloud) return _dashboardCloud;
-  try {
-    return JSON.parse(localStorage.getItem("alan_dashboard") || "[]");
-  } catch(e) { return []; }
+function getDados(force) {
+  if (_dashboardCache && !force) return Promise.resolve(_dashboardCache);
+  return fetch(`${SUPABASE_URL}/rest/v1/dashboard?select=*&order=semana.asc`, { headers: supabaseHeaders() })
+    .then(r => r.json())
+    .then(data => { _dashboardCache = data || []; return _dashboardCache; })
+    .catch(() => { _dashboardCache = []; return []; });
 }
 
 function setCloudBadge(texto, cor) {
@@ -413,79 +416,23 @@ function setCloudBadge(texto, cor) {
 }
 
 function carregarDadosDaNuvem() {
-  if (typeof SCRIPT_URL === "undefined" || !SCRIPT_URL) {
-    setCloudBadge("💾 Local", "var(--morno)");
-    return;
-  }
-  setCloudBadge("🔄 Sincronizando...", "var(--morno)");
-
-  // Carrega leads
-  fetch(SCRIPT_URL + "?tipo=leads")
-    .then(r => r.json())
-    .then(data => {
-      if (data && data.leads && data.leads.length > 0) {
-        _leadsCloud = data.leads;
-
-        try {
-          const locais = JSON.parse(localStorage.getItem("alan_leads") || "[]");
-          if (locais.length > 0) {
-            const cloudDatas = new Set(data.leads.map(l => l.data));
-            const novos = locais.filter(l => !cloudDatas.has(l.data));
-            if (novos.length > 0) {
-              _leadsCloud = [..._leadsCloud, ...novos];
-            }
-          }
-        } catch(e) {}
-      }
-
-      // Carrega dashboard
-      return fetch(SCRIPT_URL + "?tipo=dashboard");
-    })
-    .then(r => r.json())
-    .then(data => {
-      if (data && data.registros && data.registros.length > 0) {
-        _dashboardCloud = data.registros;
-
-        try {
-          const locais = JSON.parse(localStorage.getItem("alan_dashboard") || "[]");
-          if (locais.length > 0) {
-            const cloudSemanas = new Set(data.registros.map(r => r.semana));
-            const novos = locais.filter(r => !cloudSemanas.has(r.semana));
-            if (novos.length > 0) {
-              _dashboardCloud = [..._dashboardCloud, ...novos];
-              // Re-envia os novos para a nuvem
-              novos.forEach(r => enviarDashboardParaNuvem(r));
-            }
-          }
-        } catch(e) {}
-      }
-
+  setCloudBadge("🔄 Carregando...", "var(--morno)");
+  Promise.all([getLeads(true), getDados(true)])
+    .then(([leads, dados]) => {
       setCloudBadge("☁️ Nuvem ativa", "var(--quente)");
-      atualizarTudo();
+      atualizarTudo(dados, leads);
     })
     .catch(() => {
-      setCloudBadge("💾 Local", "var(--morno)");
-      atualizarTudo();
+      setCloudBadge("☁️ Nuvem ativa", "var(--quente)");
+      atualizarTudo([], []);
     });
 }
 
-function enviarDashboardParaNuvem(entry) {
-  if (typeof SCRIPT_URL === "undefined" || !SCRIPT_URL) return;
-  const payload = { tipo: "dashboard", ...entry };
-  fetch(SCRIPT_URL, {
-    method: "POST",
-    mode: "no-cors",
-    headers: { "Content-Type": "text/plain" },
-    body: JSON.stringify(payload)
-  }).catch(() => {});
-}
-
-function mergeDadosCaptura(dados) {
-  const leads = getLeads();
-  if (leads.length === 0) return dados;
+function mergeDadosCaptura(dados, leads) {
+  if (!leads || leads.length === 0) return dados;
   const semanas = {};
   leads.forEach(l => {
-    const s = l.data.slice(0,10);
+    const s = (l.created_at || "").slice(0,10);
     if (!semanas[s]) semanas[s] = { leads: 0, qualificados: 0 };
     semanas[s].leads++;
     if (l.score >= 45) semanas[s].qualificados++;
@@ -502,14 +449,6 @@ function mergeDadosCaptura(dados) {
   });
 }
 
-function salvarDados(dados) {
-  localStorage.setItem("alan_dashboard", JSON.stringify(dados));
-  if (_dashboardCloud) {
-    // Atualiza o cache cloud para incluir novos dados
-    _dashboardCloud = dados;
-  }
-}
-
 function registrarSemana() {
   const entry = {
     semana: new Date().toISOString().slice(0,10),
@@ -523,12 +462,15 @@ function registrarSemana() {
     tempo: parseInt(document.getElementById("f_tempo").value) || 7
   };
 
-  let dados = getDados();
-  dados.push(entry);
-  salvarDados(dados);
-  enviarDashboardParaNuvem(entry);
-  atualizarTudo();
-  limparForm();
+  fetch(`${SUPABASE_URL}/rest/v1/dashboard`, {
+    method: "POST",
+    headers: { ...supabaseHeaders(), "Prefer": "return=minimal" },
+    body: JSON.stringify(entry)
+  }).then(() => {
+    _dashboardCache = null;
+    getLeads(true).then(() => carregarDadosDaNuvem());
+    limparForm();
+  }).catch(() => {});
 }
 
 function limparForm() {
@@ -537,9 +479,14 @@ function limparForm() {
 }
 
 function resetarDados() {
-  if (!confirm("Tem certeza? Isso vai apagar todo o histórico.")) return;
-  localStorage.removeItem("alan_dashboard");
-  atualizarTudo();
+  if (!confirm("Tem certeza? Isso vai apagar todo o histórico do dashboard.")) return;
+  fetch(`${SUPABASE_URL}/rest/v1/dashboard`, {
+    method: "DELETE",
+    headers: supabaseHeaders()
+  }).then(() => {
+    _dashboardCache = null;
+    carregarDadosDaNuvem();
+  }).catch(() => {});
 }
 
 function calcularIndicadores(dados) {
@@ -676,25 +623,29 @@ function atualizarTabela(dados) {
   }).reverse().join("");
 }
 
-function excluirLead(index) {
+function excluirLead(id) {
   if (!confirm("Excluir este lead?")) return;
-  let leads = getLeads();
-  leads.splice(index, 1);
-  localStorage.setItem("alan_leads", JSON.stringify(leads));
-  atualizarLeadsTable();
-  atualizarTudo();
+  fetch(`${SUPABASE_URL}/rest/v1/leads?id=eq.${id}`, {
+    method: "DELETE",
+    headers: supabaseHeaders()
+  }).then(() => {
+    _leadsCache = null;
+    getLeads(true).then(leads => {
+      atualizarLeadsTable(leads);
+      carregarDadosDaNuvem();
+    });
+  }).catch(() => {});
 }
 
-var _editLeadIndex = -1;
+var _editLeadId = null;
 
-function verPerfilLead(index) {
-  const leads = getLeads();
-  const idx = leads.length - 1 - index;
-  const l = leads[idx];
+function verPerfilLead(id) {
+  const leads = _leadsCache || [];
+  const l = leads.find(x => x.id === id);
   const panel = document.getElementById("leadProfilePanel");
   const overlay = document.getElementById("leadProfileOverlay");
   if (!l) return;
-  _editLeadIndex = idx;
+  _editLeadId = id;
   const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
   renderPerfil(l, false, tempCls);
   panel.style.display = "block";
@@ -702,26 +653,35 @@ function verPerfilLead(index) {
 }
 
 function renderPerfil(l, editing, tempCls) {
-  const entries = Object.entries(l.respostas);
+  const campos = [
+    { chave: "nome", label: "Nome", valor: l.nome },
+    { chave: "finalidade", label: "Finalidade", valor: l.finalidade },
+    { chave: "orcamento", label: "Orçamento", valor: l.orcamento },
+    { chave: "pagamento", label: "Pagamento", valor: l.pagamento },
+    { chave: "bairro", label: "Bairro", valor: l.bairro },
+    { chave: "prazo", label: "Prazo", valor: l.prazo },
+    { chave: "whatsapp", label: "WhatsApp", valor: l.whatsapp },
+    { chave: "email", label: "E-mail", valor: l.email }
+  ];
   const score = l.score;
-  const dataStr = new Date(l.data).toLocaleString("pt-BR");
+  const dataStr = new Date(l.created_at).toLocaleString("pt-BR");
   const temp = l.temperatura;
 
   if (!editing) {
-    const wpp = l.respostas.whatsapp || "";
-    const email = l.respostas.email || "";
-    const wppLink = wpp ? `https://wa.me/55${wpp.replace(/\D/g,'')}?text=Ol%C3%A1%20${encodeURIComponent(l.respostas.nome||'')}!%20Vi%20seu%20contato%20aqui%20no%20meu%20dashboard%20e%20gostaria%20de%20saber%20mais%20sobre%20im%C3%B3veis%20em%20Fortaleza.` : "";
+    const wpp = l.whatsapp || "";
+    const email = l.email || "";
+    const wppLink = wpp ? `https://wa.me/55${wpp.replace(/\D/g,'')}?text=Ol%C3%A1%20${encodeURIComponent(l.nome||'')}!%20Vi%20seu%20contato%20no%20meu%20dashboard.` : "";
     const emailLink = email ? `mailto:${email}?subject=Im%C3%B3veis%20Fortaleza%20-%20Alan%20Damasceno` : "";
     document.getElementById("profileContent").innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:8px">
-        <h3 style="color:var(--primary);font-size:17px;font-weight:700">${l.respostas.nome || "Sem nome"}</h3>
+        <h3 style="color:var(--primary);font-size:17px;font-weight:700">${l.nome || "Sem nome"}</h3>
         <span class="badge ${tempCls}" style="font-size:12px;padding:4px 12px;white-space:nowrap">${temp} · ${score}/100</span>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        ${entries.map(([k,v]) => `
+        ${campos.map(c => `
           <div style="background:#f8f9fa;border-radius:6px;padding:8px 10px">
-            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.2px;color:#5c6675">${k}</div>
-            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:1px;word-break:break-word">${v}</div>
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.2px;color:#5c6675">${c.label}</div>
+            <div style="font-size:13px;font-weight:600;color:var(--text);margin-top:1px;word-break:break-word">${c.valor || "-"}</div>
           </div>
         `).join("")}
       </div>
@@ -742,10 +702,10 @@ function renderPerfil(l, editing, tempCls) {
         <span class="badge ${tempCls}" style="font-size:12px;padding:4px 12px;white-space:nowrap">${temp} · ${score}/100</span>
       </div>
       <div id="editGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-        ${entries.map(([k,v]) => `
+        ${campos.map(c => `
           <div style="background:#f8f9fa;border-radius:6px;padding:8px 10px">
-            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.2px;color:#5c6675;margin-bottom:2px">${k}</div>
-            <input id="edit_${k}" value="${(v || '').replace(/"/g,'&quot;')}" style="width:100%;padding:8px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;font-family:inherit;outline:none;min-height:36px">
+            <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.2px;color:#5c6675;margin-bottom:2px">${c.label}</div>
+            <input id="edit_${c.chave}" value="${(c.valor || '').replace(/"/g,'&quot;')}" style="width:100%;padding:8px;border:1.5px solid #ddd;border-radius:6px;font-size:13px;font-family:inherit;outline:none;min-height:36px">
           </div>
         `).join("")}
       </div>
@@ -759,34 +719,41 @@ function renderPerfil(l, editing, tempCls) {
 }
 
 function editarPerfilLead() {
-  const leads = getLeads();
-  const l = leads[_editLeadIndex];
+  const leads = _leadsCache || [];
+  const l = leads.find(x => x.id === _editLeadId);
   if (!l) return;
   const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
   renderPerfil(l, true, tempCls);
 }
 
 function cancelarEdicaoLead() {
-  const leads = getLeads();
-  const l = leads[_editLeadIndex];
+  const leads = _leadsCache || [];
+  const l = leads.find(x => x.id === _editLeadId);
   if (!l) return;
   const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
   renderPerfil(l, false, tempCls);
 }
 
 function salvarEdicaoLead() {
-  let leads = getLeads();
-  const l = leads[_editLeadIndex];
+  const leads = _leadsCache || [];
+  const l = leads.find(x => x.id === _editLeadId);
   if (!l) return;
-  Object.keys(l.respostas).forEach(k => {
+  const updates = {};
+  ["nome","finalidade","orcamento","pagamento","bairro","prazo","whatsapp","email"].forEach(k => {
     const inp = document.getElementById("edit_" + k);
-    if (inp) l.respostas[k] = inp.value;
+    if (inp) updates[k] = inp.value;
   });
-  leads[_editLeadIndex] = l;
-  localStorage.setItem("alan_leads", JSON.stringify(leads));
-  const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
-  renderPerfil(l, false, tempCls);
-  atualizarLeadsTable();
+  fetch(`${SUPABASE_URL}/rest/v1/leads?id=eq.${_editLeadId}`, {
+    method: "PATCH",
+    headers: supabaseHeaders(),
+    body: JSON.stringify(updates)
+  }).then(() => {
+    const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
+    Object.assign(l, updates);
+    renderPerfil(l, false, tempCls);
+    _leadsCache = null;
+    getLeads(true).then(leads => atualizarLeadsTable(leads));
+  }).catch(() => {});
 }
 
 function fecharPerfilLead() {
@@ -794,8 +761,8 @@ function fecharPerfilLead() {
   document.getElementById("leadProfileOverlay").style.display = "none";
 }
 
-function atualizarLeadsTable() {
-  const leads = getLeads();
+function atualizarLeadsTable(leads) {
+  if (!leads) leads = _leadsCache || [];
   const tbody = document.getElementById("leadsBody");
   const hint = document.getElementById("leadsHint");
   if (leads.length === 0) {
@@ -807,16 +774,16 @@ function atualizarLeadsTable() {
   const totalEl = document.getElementById("totalLeadsCount");
   if (totalEl) totalEl.textContent = leads.length;
 
-  tbody.innerHTML = leads.slice().reverse().slice(0,50).map((l, i) => {
+  tbody.innerHTML = leads.slice(0,50).map(l => {
     const tempCls = l.temperatura === "Quente" ? "quente" : l.temperatura === "Morno" ? "morno" : "frio";
-    const wpp = l.respostas.whatsapp || "";
-    const email = l.respostas.email || "";
-    const wppLink = wpp ? `https://wa.me/55${wpp.replace(/\D/g,'')}?text=Ol%C3%A1%20${encodeURIComponent(l.respostas.nome||'')}!%20Vi%20seu%20contato%20no%20meu%20dashboard.` : "";
+    const wpp = l.whatsapp || "";
+    const email = l.email || "";
+    const wppLink = wpp ? `https://wa.me/55${wpp.replace(/\D/g,'')}?text=Ol%C3%A1%20${encodeURIComponent(l.nome||'')}!%20Vi%20seu%20contato%20no%20meu%20dashboard.` : "";
     const emailLink = email ? `mailto:${email}?subject=Im%C3%B3veis%20Fortaleza%20-%20Alan%20Damasceno` : "";
     return `
       <tr>
-        <td data-label="Data">${new Date(l.data).toLocaleDateString("pt-BR")}</td>
-        <td data-label="Nome"><a href="#" onclick="verPerfilLead(${i});return false" style="color:var(--secondary);font-weight:600;text-decoration:underline">${l.respostas.nome || "-"}</a></td>
+        <td data-label="Data">${new Date(l.created_at).toLocaleDateString("pt-BR")}</td>
+        <td data-label="Nome"><a href="#" onclick="verPerfilLead(${l.id});return false" style="color:var(--secondary);font-weight:600;text-decoration:underline">${l.nome || "-"}</a></td>
         <td data-label="Temp."><span class="badge ${tempCls}">${l.temperatura}</span></td>
         <td data-label="Score">${l.score}/100</td>
         <td data-label="Contato" style="font-size:12px">
@@ -826,7 +793,7 @@ function atualizarLeadsTable() {
           ${!wpp && !email ? "-" : ""}
         </td>
         <td data-label="Ação">
-          <button onclick="excluirLead(${leads.length - 1 - i})" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:18px;padding:4px 8px;min-height:38px" title="Excluir lead">🗑️</button>
+          <button onclick="excluirLead(${l.id})" style="background:none;border:none;cursor:pointer;color:#c0392b;font-size:18px;padding:4px 8px;min-height:38px" title="Excluir lead">🗑️</button>
         </td>
       </tr>
     `;
@@ -840,7 +807,7 @@ function atualizarGrafico(dados) {
     chartInstance = new Chart(ctx, {
       type: "line",
       data: {
-        labels: dados.map(d => d.semana.slice(5)),
+        labels: dados.length > 0 ? dados.map(d => d.semana.slice(5)) : [],
         datasets: [
           { label: "Qualificados", data: dados.map(d => d.qualificados), borderColor: "#D4A017", backgroundColor: "rgba(212,160,23,0.1)", fill: true, tension: 0.3 },
           { label: "Visitas", data: dados.map(d => d.visitas), borderColor: "#1B2B4B", backgroundColor: "rgba(27,43,75,0.1)", fill: true, tension: 0.3 }
@@ -899,18 +866,19 @@ function atualizarGrafico(dados) {
   });
 }
 
-function atualizarTudo() {
-  let dados = getDados();
-  dados = mergeDadosCaptura(dados);
+function atualizarTudo(dados, leads) {
+  if (!dados) { dados = _dashboardCache || []; }
+  dados = mergeDadosCaptura(dados, leads || _leadsCache || []);
   const ind = calcularIndicadores(dados);
   atualizarMetricas(ind);
   atualizarVeredito(ind, dados);
   atualizarTabela(dados);
   atualizarGrafico(dados);
-  atualizarLeadsTable();
+  if (leads) atualizarLeadsTable(leads);
+  else if (_leadsCache) atualizarLeadsTable(_leadsCache);
+  else getLeads().then(l => atualizarLeadsTable(l));
 }
 
-atualizarTudo();
 carregarDadosDaNuvem();
 </script>
 </body>

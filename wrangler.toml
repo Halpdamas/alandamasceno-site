@@ -1,4 +1,0 @@
-# Config para Cloudflare Pages (não Workers)
-# Deploy via dashboard: Pages > Create > Connect to Git
-# Build: framework=None, build output=.
-# Ou via CLI: npx wrangler pages deploy . --project-name clarity-finance-2

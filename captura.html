@@ -194,8 +194,8 @@ const PERGUNTAS = [
   }
 ];
 
-// COLE A URL DO GOOGLE APPS SCRIPT AQUI (instruções no arquivo GoogleSheets_AppsScript.gs)
-// const SCRIPT_URL = "https://script.google.com/macros/s/SEU_ID_AQUI/exec";
+const SUPABASE_URL = "https://qukcsvmtokjgldkatysp.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF1a2Nzdm10b2tqZ2xka2F0eXNwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxMTQ0ODQsImV4cCI6MjA5OTY5MDQ4NH0.YJGE9qlgyLz1jWyNHpkQqziqiFcwHRVELLuMJTTpUcw";
 
 const SCORE_MAP = {
   finalidade: { "Moradia": 20, "Investimento": 25, "Ainda não decidi": 5 },
@@ -368,70 +368,48 @@ function finalizar() {
 }
 
 function salvarLead(score, temp) {
-  try {
-    let historico = JSON.parse(localStorage.getItem("alan_leads") || "[]");
-    historico.push({
-      data: new Date().toISOString(),
-      respostas,
-      score,
-      temperatura: temp
-    });
-    localStorage.setItem("alan_leads", JSON.stringify(historico));
-    sincronizarDashboard(score);
-    enviarParaPlanilha(score, temp);
-    atualizarContadores();
-  } catch(e) {}
-}
-
-function enviarParaPlanilha(score, temp) {
-  if (typeof SCRIPT_URL === "undefined" || !SCRIPT_URL.startsWith("https://")) return;
-  try {
-    const payload = {
-      tipo: "lead",
-      respostas: respostas,
+  fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+    method: "POST",
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`,
+      "Content-Type": "application/json",
+      "Prefer": "return=minimal"
+    },
+    body: JSON.stringify({
+      nome: respostas.nome || "",
+      finalidade: respostas.finalidade || "",
+      orcamento: respostas.orcamento || "",
+      pagamento: respostas.pagamento || "",
+      bairro: respostas.bairro || "",
+      prazo: respostas.prazo || "",
+      whatsapp: respostas.whatsapp || "",
+      email: respostas.email || "",
       score: score,
       temperatura: temp
-    };
-    fetch(SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify(payload)
-    }).catch(() => {});
-  } catch(e) {}
-}
-
-function sincronizarDashboard(score) {
-  try {
-    let dados = JSON.parse(localStorage.getItem("alan_dashboard") || "[]");
-    const hoje = new Date().toISOString().slice(0,10);
-    let entry = dados.find(d => d.semana === hoje);
-    if (!entry) {
-      entry = { semana: hoje, leads: 0, qualificados: 0, visitas: 0, propostas: 0, fechamentos: 0, comissao: 0, trafego: 0, tempo: 7 };
-      dados.push(entry);
-    }
-    entry.leads = (entry.leads || 0) + 1;
-    if (score >= 45) {
-      entry.qualificados = (entry.qualificados || 0) + 1;
-    }
-    localStorage.setItem("alan_dashboard", JSON.stringify(dados));
-  } catch(e) {}
+    })
+  }).catch(() => {});
+  atualizarContadores();
 }
 
 function atualizarContadores() {
-  try {
-    const historico = JSON.parse(localStorage.getItem("alan_leads") || "[]");
-    const hoje = new Date().toDateString();
-    const hojeLeads = historico.filter(l =>
-      new Date(l.data).toDateString() === hoje
-    );
-    document.getElementById("todayCount").textContent = hojeLeads.length;
-
-    const total = historico.length;
-    const qualificados = historico.filter(l => l.score >= 45).length;
-    const taxa = total > 0 ? Math.round((qualificados / total) * 100) : 0;
-    document.getElementById("qualRate").textContent = taxa + "%";
-  } catch(e) {}
+  fetch(`${SUPABASE_URL}/rest/v1/leads?select=score`, {
+    headers: {
+      "apikey": SUPABASE_KEY,
+      "Authorization": `Bearer ${SUPABASE_KEY}`
+    }
+  })
+    .then(r => r.json())
+    .then(leads => {
+      const total = leads.length;
+      const hoje = new Date().toDateString();
+      const hojeLeads = leads.filter(l => new Date(l.created_at).toDateString() === hoje).length;
+      const qualificados = leads.filter(l => l.score >= 45).length;
+      const taxa = total > 0 ? Math.round((qualificados / total) * 100) : 0;
+      document.getElementById("todayCount").textContent = hojeLeads;
+      document.getElementById("qualRate").textContent = taxa + "%";
+    })
+    .catch(() => {});
 }
 
 sendBtn.addEventListener("click", () => {
