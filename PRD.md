@@ -260,7 +260,163 @@ git push origin main
 
 ---
 
-## 8. Checklist de Replicação
+## 8. Passo a Passo de Desenvolvimento (do zero, sem erros)
+
+Este é o roteiro para construir o sistema **do início** para um novo corretor, aplicando todas as lições aprendidas.
+
+### Fase 0 — Planejamento (30 min)
+
+- [ ] Definir o público: corretor autônomo (PF/MEI), cidade, segmento
+- [ ] Coletar assets: foto (quadrada, 500x500px), WhatsApp, Instagram, CRECI, cores da marca
+- [ ] Decidir stack ANTES de codificar:
+  ```json
+  Frontend: HTML + CSS + JS vanilla
+  Gráficos: Chart.js
+  Exportação: SheetJS + html2pdf
+  Banco: Supabase (PostgreSQL) — NUNCA Google Sheets
+  Hospedagem: Vercel + (opcional) GitHub Pages para WhatsApp
+  Domínio ideal: .com.br próprio (~R$ 40/ano)
+  ```
+- [ ] Definir arquitetura de routing:
+  ```
+  Domínio próprio → Vercel → HTML direto
+  ├── /          → mini-site
+  ├── /lead      → captura  
+  └── /dash      → dashboard
+  ```
+- [ ] Criar repositório GitHub com branch `main`
+
+### Fase 1 — Mini-site (1-2h)
+
+- [ ] Criar `alan-damasceno.html` com:
+  - Meta tags OG (title, description, image, url — apontando para o domínio final)
+  - Google Fonts (Inter)
+  - CSS variables para as cores da marca
+  - Hero: foto, nome, CRECI, cidade, WhatsApp
+  - Seção "Sobre"
+  - Serviços (cards)
+  - Cartão digital com QR Code (api.qrserver.com) + vCard
+  - Footer com links
+- [ ] Criar `assets/alan-damasceno.vcf` com dados de contato
+- [ ] **Testar responsivo** no celular e WhatsApp
+
+### Fase 2 — Supabase (1h)
+
+- [ ] Criar conta em [supabase.com](https://supabase.com)
+- [ ] Novo projeto
+- [ ] Pegar Project URL + Anon Key (Settings → API)
+- [ ] Rodar `supabase-setup.sql` no SQL Editor — cria tabelas `leads` e `dashboard` com RLS anon
+
+### Fase 3 — Captura de Leads (2-3h)
+
+- [ ] Criar `captura.html` com:
+  - Chatbot com perguntas (definir quais campos capturar)
+  - Score map (pesos por resposta)
+  - Classificação: Quente/Morno/Frio
+  - Botão "Falar com [Nome]" no topo (WhatsApp direto)
+  - Salvar no Supabase via REST API:
+    ```js
+    fetch(`${SUPABASE_URL}/rest/v1/leads`, {
+      method: "POST",
+      headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ nome, finalidade, orcamento, ... })
+    })
+    ```
+  - Contadores: leads hoje, taxa de qualificação (lendo do Supabase)
+  - **NÃO** usar Google Sheets
+  - **NÃO** exibir JSON/raw data na interface
+- [ ] **Testar:** preencher formulário → verificar se aparece no Supabase Table Editor
+
+### Fase 4 — Dashboard de Decisão (3-4h)
+
+- [ ] Criar `dashboard-decisao.html` com:
+  - Hero com badge de conexão (☁️ Nuvem ativa / 💾 Local)
+  - Card de veredito com barra de progresso (0-7 indicadores)
+  - Grid de 7 indicadores-gatilho (cada um: label, valor, meta, status)
+  - Formulário "Registrar Semana" (8 campos numéricos)
+  - Botões: Registrar Semana, Limpar Histórico
+  - Tabela de histórico semanal (com dados mesclados dos leads)
+  - Gráfico Chart.js (leads qualificados vs visitas)
+  - Tabela de leads (com perfil, edição, exclusão, WhatsApp/E-mail inline)
+  - Regras de decisão (cards no mobile, tabela no desktop)
+  - Exportar Excel (3 abas: Dashboard, Indicadores, Leads)
+  - Exportar PDF (clone com CSS forçado desktop + A4 landscape)
+  - Ler do Supabase via REST API:
+    ```js
+    fetch(`${SUPABASE_URL}/rest/v1/leads?select=*&order=created_at.desc`, { headers: supabaseHeaders() })
+    fetch(`${SUPABASE_URL}/rest/v1/dashboard?select=*&order=semana.asc`, { headers: supabaseHeaders() })
+    ```
+  - Salvar dashboard no Supabase via POST
+  - **Toda operação (registrar, editar, excluir lead) → Supabase** (nunca localStorage)
+- [ ] **Testar:** registrar semana → recarregar → dados persistem
+
+### Fase 5 — Routing e Deploy (1h)
+
+- [ ] Criar `vercel.json` com rewrites:
+  ```json
+  { "source": "/", "destination": "/alan-damasceno.html" },
+  { "source": "/lead", "destination": "/lead.html" },
+  { "source": "/dash", "destination": "/dash.html" }
+  ```
+- [ ] Criar `lead.html` (redirect JS para captura.html) e `dash.html` (redirect JS para dashboard-decisao.html)
+- [ ] Conectar repositório ao Vercel (branch: `main`)
+- [ ] **Testar TODAS as rotas:**
+  ```bash
+  curl -I https://alandamasceno-site.vercel.app     # → 200
+  curl -I https://alandamasceno-site.vercel.app/lead # → 200
+  curl -I https://alandamasceno-site.vercel.app/dash # → 200
+  ```
+
+### Fase 6 — Compatibilidade WhatsApp (1h) — SE NECESSÁRIO
+
+**Se o corretor NÃO tiver domínio próprio (usa .vercel.app):**
+- [ ] Criar repositório GitHub separado (ex: `halpdamas/alan-damasceno`)
+- [ ] Criar `index.html` com redirect + hash routing:
+  ```js
+  var h = location.hash.replace('#','');
+  var map = { lead:'/lead', dash:'/dash' };
+  var url = 'https://SEU_SITE.vercel.app' + (map[h] || '');
+  window.location.href = url;
+  ```
+- [ ] Habilitar GitHub Pages (Settings → Pages → branch: master)
+- [ ] **Testar no WhatsApp mobile:**
+  ```
+  https://halpdamas.github.io/alan-damasceno
+  https://halpdamas.github.io/alan-damasceno#lead
+  https://halpdamas.github.io/alan-damasceno#dash
+  ```
+
+**Solução definitiva:** comprar domínio próprio e apontar DNS para Vercel — elimina o redirect e funciona em qualquer lugar.
+
+### Fase 7 — Documentação e Finalização (1h)
+
+- [ ] Criar `README.md` com links, stack, setup rápido
+- [ ] Criar `PRD.md` com documentação completa
+- [ ] Limpar: deletar scripts de debug, arquivos legados, `.gitignore` correto
+- [ ] Verificar `.gitignore`:
+  ```
+  node_modules/
+  .env
+  *.log
+  Thumbs.db
+  .DS_Store
+  ```
+- [ ] Último commit → push → testar tudo de novo
+- [ ] **Entregar para o corretor:**
+  - 3 links (site, captura, dashboard)
+  - Instruções do WhatsApp Business App (mensagem de ausência)
+  - Instruções de como enviar os links no Status do WhatsApp
+
+### Fase 8 — Pós-entrega
+
+- [ ] Monitorar se os leads estão chegando no Supabase
+- [ ] Ajustar metas do dashboard conforme o corretor usa
+- [ ] Oferecer upgrade: chatbot WhatsApp direto (Tidio ~R$ 120/mês)
+- [ ] Oferecer domínio próprio (cobrar à parte ou incluso)
+
+---
+
+## 9. Checklist de Replicação
 
 ### Pré-requisitos
 - [ ] Conta GitHub
@@ -304,7 +460,7 @@ git push origin main
 
 ---
 
-## 9. Contato
+## 10. Contato
 
 **Produto desenvolvido para:** Alan Damasceno — CRECI 27671
 **Instagram:** @alanpdamasceno
