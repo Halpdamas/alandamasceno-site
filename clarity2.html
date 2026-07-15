@@ -6,7 +6,7 @@
 <title>Clarity 2 — Personal Finance Tracker</title>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<!-- Babel not needed (no JSX) -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js"></script>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -71,7 +71,7 @@ body{font-family:'Inter',system-ui,sans-serif;background:#F7F9F8;color:#0F172A;-
 </head>
 <body>
 <div id="root"></div>
-<script type="text/babel">
+<script>
 const {useState,useEffect,useRef,useCallback,useMemo,createContext,useContext} = React;
 const {createPortal} = ReactDOM;
 
@@ -90,6 +90,7 @@ const DB_KEY='clarity2_db';
 function loadDb(){try{const d=localStorage.getItem(DB_KEY);if(d){const p=JSON.parse(d);return{users:[],profiles:{},income:[],expenses:[],budgets:[],goals:[],annualObligations:[],businessDeductions:[],accounts:[],imports:[],userProfiles:{},...p};}}catch(e){}return defaultDb();}
 function saveDb(db){localStorage.setItem(DB_KEY,JSON.stringify(db));}
 function defaultDb(){return{users:[],profiles:{},income:[],expenses:[],budgets:[],goals:[],annualObligations:[],businessDeductions:[],accounts:[],imports:[],userProfiles:{}};}
+
 function periodDates(period,now){const y=now.getFullYear(),m=now.getMonth();if(period==='month')return{start:new Date(y,m,1),end:new Date(y,m+1,0)};if(period==='quarter'){const q=Math.floor(m/3);return{start:new Date(y,q*3,1),end:new Date(y,q*3+3,0)};}return{start:new Date(y,0,1),end:new Date(y,11,31)};}
 function prevPeriod(period,now){const y=now.getFullYear(),m=now.getMonth();if(period==='month'){const d=new Date(y,m-1,1);return{start:new Date(d.getFullYear(),d.getMonth(),1),end:new Date(d.getFullYear(),d.getMonth()+1,0)};}if(period==='quarter'){const q=Math.floor(m/3);if(q===0)return{start:new Date(y-1,9,1),end:new Date(y-1,11,31)};return{start:new Date(y,(q-1)*3,1),end:new Date(y,(q-1)*3+3,0)};}return{start:new Date(y-1,0,1),end:new Date(y-1,11,31)};}
 function inPeriod(d,start,end){const dt=parseDate(d);return dt>=start&&dt<=end;}
@@ -419,7 +420,7 @@ const TRANS = {
     rows:'lignes',file:'Fichier',deleteImport:"Supprimer l'Importation",
     confirmDeleteImport:'Cela supprimera toutes les transactions de cette importation.',
     repeatFixed:'Répéter les dépenses fixes du mois dernier',
-    aiChat:'Chat IA',aiWarning:'Vos données sont envoyées au fournisseur d'IA pour traitement.',
+    aiChat:'Chat IA',aiWarning:"Vos données sont envoyées au fournisseur d'IA pour traitement.",
     askQuestion:'Posez une question sur vos finances...',send:'Envoyer',generating:'Génération...',
     generateReport:'Générer un Rapport',download:'Télécharger',report:'Rapport Financier',
     categorizeSuggest:'Suggérer une Catégorisation',approve:'Approuver',
