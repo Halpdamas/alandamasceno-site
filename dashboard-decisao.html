@@ -972,15 +972,53 @@ function exportarExcel() {
 }
 
 function exportarPDF() {
-  const element = document.querySelector(".wrap");
-  const opt = {
+  const original = document.querySelector(".wrap");
+
+  const clone = original.cloneNode(true);
+  clone.style.position = "fixed";
+  clone.style.left = "-9999px";
+  clone.style.top = "0";
+  clone.style.width = "1100px";
+  clone.style.maxWidth = "none";
+  clone.style.background = "#F8F9FA";
+  clone.style.padding = "24px";
+  clone.style.zIndex = "-1";
+
+  // Forca estilo desktop no clone
+  const styleTag = document.createElement("style");
+  styleTag.textContent = `
+    thead{display:table-header-group!important}
+    tbody td{display:table-cell!important;text-align:left!important;padding:10px 14px!important;font-size:13px!important;border-bottom:1px solid #f0f0f0!important}
+    tbody td:before{content:none!important}
+    tbody tr{display:table-row!important;padding:0!important;border:none!important}
+    table{min-width:700px!important;font-size:13px!important}
+    thead th{padding:10px 14px!important;font-size:12px!important;background:var(--primary,#1B2B4B)!important;color:#fff!important}
+    .table-section{overflow:visible!important}
+    .regras table{display:table!important}
+    .regras-cards{display:none!important}
+    .metricas-grid{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))!important}
+    .chart-card canvas{max-height:260px!important}
+    .form-row{grid-template-columns:repeat(auto-fit,minmax(160px,1fr))!important}
+    .form-row-btn button{flex:initial!important;min-width:auto!important}
+    .veredito{padding:24px 28px!important}
+    .veredito .icon{font-size:42px!important}
+    .hero{padding:32px 36px!important}
+    .hero h1{font-size:26px!important}
+    .section-title{font-size:18px!important}
+  `;
+  clone.prepend(styleTag);
+
+  document.body.appendChild(clone);
+
+  html2pdf().set({
     margin: [8, 8],
     filename: "AlanDamasceno_Dashboard.pdf",
     image: { type: "jpeg", quality: 0.95 },
-    html2canvas: { scale: 2, useCORS: true, logging: false, width: element.scrollWidth, windowWidth: element.scrollWidth },
+    html2canvas: { scale: 2, useCORS: true, logging: false, width: 1100, windowWidth: 1100 },
     jsPDF: { unit: "mm", format: "a4", orientation: "landscape" }
-  };
-  html2pdf().set(opt).from(element).save();
+  }).from(clone).save().then(() => {
+    document.body.removeChild(clone);
+  });
 }
 </script>
 </body>
