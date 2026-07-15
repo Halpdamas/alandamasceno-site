@@ -85,7 +85,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-
 .resultado .btn-final:hover{background:#c08e10}
 .resultado .btn-whatsapp{display:block;width:100%;padding:14px;text-align:center;background:#25D366;color:var(--white);border:none;border-radius:var(--radius);font-weight:700;font-size:15px;cursor:pointer;font-family:inherit;transition:background 0.2s;text-decoration:none;margin-top:8px}
 .resultado .btn-whatsapp:hover{background:#1da851}
-.resultado .lead-data{font-size:12px;color:#5c6675;text-align:center;margin-top:12px;word-break:break-all}
 
 /* CONTADOR */
 .counter-bar{background:var(--primary);margin:0 24px 4px;border-radius:0 0 var(--radius) var(--radius);padding:10px 18px;display:flex;justify-content:space-between;font-size:12px;color:#b8c4d4}
@@ -115,6 +114,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-
       <img src="assets/alan-foto.png" alt="Alan Damasceno" class="wordmark">
       <h2>Encontre o imóvel ideal</h2>
       <p>Responda algumas perguntas rápidas para eu entender seu perfil</p>
+      <a href="https://wa.me/5585989633522" target="_blank" style="display:inline-block;margin-top:10px;padding:8px 16px;background:#25D366;color:#fff;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none">💬 Falar com Alan no WhatsApp</a>
     </div>
 
     <div class="chat-area" id="chat"></div>
@@ -132,7 +132,6 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-
       <div class="score" id="scoreDisplay"></div>
       <div class="resultado-grid" id="resultadoGrid"></div>
       <a id="whatsappLink" target="_blank" class="btn-whatsapp">&#128172; Falar com Alan no WhatsApp</a>
-      <div class="lead-data" id="leadData"></div>
     </div>
   </div>
 
@@ -352,14 +351,6 @@ function finalizar() {
 
       document.getElementById("whatsappLink").href =
         `https://wa.me/5585989633522?text=${dados}`;
-
-      const dataStr = JSON.stringify({
-        timestamp: new Date().toISOString(),
-        respostas,
-        score,
-        temperatura: temp.label
-      }, null, 2);
-      document.getElementById("leadData").textContent = "Dados do lead: " + dataStr;
 
       salvarLead(score, temp.label);
       isProcessing = false;
