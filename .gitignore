@@ -1,10 +1,9 @@
-# Old project files
-alan-damasceno.html
-alan.html
-assets/
-captura.html
-dash.html
-dashboard-decisao.html
-GoogleSheets_AppsScript.gs
-INSTRUCOES_GOOGLE_SHEETS.md
-lead.html
+# OS
+Thumbs.db
+.DS_Store
+
+# Python (debug scripts, not part of the project)
+*.py
+
+# Environment
+.env
