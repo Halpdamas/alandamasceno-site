@@ -892,43 +892,93 @@ function atualizarTudo(dados, leads) {
 carregarDadosDaNuvem();
 
 function exportarExcel() {
-  const dados = _dashboardCache || [];
-  const leads = _leadsCache || [];
-  if (dados.length === 0 && leads.length === 0) { alert("Nenhum dado para exportar."); return; }
+  Promise.all([
+    fetch(`${SUPABASE_URL}/rest/v1/dashboard?select=*&order=semana.asc`, { headers: supabaseHeaders() }).then(r => r.json()).catch(() => []),
+    fetch(`${SUPABASE_URL}/rest/v1/leads?select=*&order=created_at.desc`, { headers: supabaseHeaders() }).then(r => r.json()).catch(() => [])
+  ]).then(([dados, leads]) => {
+    if (dados.length === 0 && leads.length === 0) { alert("Nenhum dado para exportar."); return; }
 
-  const wb = XLSX.utils.book_new();
+    const wb = XLSX.utils.book_new();
 
-  // Aba Dashboard
-  if (dados.length > 0) {
-    const wsData = [["Semana","Leads","Qualificados","Visitas","Propostas","Fechamentos","Comissao","Trafego","Tempo"]];
-    dados.forEach(d => wsData.push([d.semana, d.leads, d.qualificados, d.visitas, d.propostas, d.fechamentos, d.comissao, d.trafego, d.tempo]));
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    XLSX.utils.book_append_sheet(wb, ws, "Dashboard");
-  }
+    // Monta semanas com leads por data
+    const semanas = {};
+    leads.forEach(l => {
+      const s = (l.created_at || "").slice(0,10);
+      if (!semanas[s]) semanas[s] = { leads: 0, qualificados: 0 };
+      semanas[s].leads++;
+      if (l.score >= 45) semanas[s].qualificados++;
+    });
 
-  // Aba Leads
-  if (leads.length > 0) {
-    const wsData = [["Data","Nome","Finalidade","Orcamento","Pagamento","Bairro","Prazo","WhatsApp","Email","Score","Temperatura"]];
-    leads.forEach(l => wsData.push([
-      new Date(l.created_at).toLocaleString("pt-BR"),
-      l.nome, l.finalidade, l.orcamento, l.pagamento,
-      l.bairro, l.prazo, l.whatsapp, l.email, l.score, l.temperatura
-    ]));
-    const ws = XLSX.utils.aoa_to_sheet(wsData);
-    XLSX.utils.book_append_sheet(wb, ws, "Leads");
-  }
+    // Aba Dashboard — mesma visão da tela
+    if (dados.length > 0) {
+      const cab = ["Semana","Leads","Qualificados","% Qualif.","Visitas","Propostas","Fechamentos","Comissao (R$)","Trafego (R$)","Custo/Lead (R$)","Tempo (dias)","Leads (auto)","Qualif. (auto)"];
+      const linhas = dados.map(d => {
+        const leadsAuto = semanas[d.semana];
+        const leadsTotal = Math.max(d.leads || 0, leadsAuto ? leadsAuto.leads : 0);
+        const qualifTotal = Math.max(d.qualificados || 0, leadsAuto ? leadsAuto.qualificados : 0);
+        const taxa = leadsTotal > 0 ? Math.round((qualifTotal / leadsTotal) * 100) : 0;
+        const custo = qualifTotal > 0 ? (d.trafego / qualifTotal).toFixed(2) : "-";
+        return [d.semana, leadsTotal, qualifTotal, taxa + "%", d.visitas, d.propostas, d.fechamentos, d.comissao, d.trafego, custo, d.tempo, leadsAuto ? leadsAuto.leads : 0, leadsAuto ? leadsAuto.qualificados : 0];
+      });
+      const ws = XLSX.utils.aoa_to_sheet([cab, ...linhas]);
+      ws["!cols"] = [{wch:12},{wch:7},{wch:12},{wch:10},{wch:8},{wch:10},{wch:10},{wch:14},{wch:13},{wch:14},{wch:12},{wch:12},{wch:12}];
+      XLSX.utils.book_append_sheet(wb, ws, "Dashboard");
+    }
 
-  XLSX.writeFile(wb, "AlanDamasceno_Dados.xlsx");
+    // Aba Indicadores (resumo)
+    if (dados.length > 0) {
+      const dadosMerge = dados.map(d => {
+        const auto = semanas[d.semana];
+        if (auto) {
+          d.leads_auto = auto.leads;
+          d.qualificados_auto = auto.qualificados;
+          d.leads = Math.max(d.leads || 0, auto.leads);
+          d.qualificados = Math.max(d.qualificados || 0, auto.qualificados);
+        }
+        return d;
+      });
+      const ind = calcularIndicadores(dadosMerge);
+      if (ind) {
+        const METAS_KEYS = { leads_qualif_semana: "Leads qualif./semana", taxa_qualificacao: "Taxa de qualificação", visitas_semana: "Visitas/semana", propostas_semana: "Propostas/semana", tempo_lead_visita: "Tempo lead → visita", custo_lead_qualif: "Custo/lead qualif.", receita_mensal: "Receita mensal" };
+        const cab = ["Indicador", "Valor", "Meta", "Status"];
+        const linhas = Object.entries(METAS_KEYS).map(([key, label]) => {
+          const d = ind[key];
+          const meta = METAS[key].meta;
+          const unid = METAS[key].unidade;
+          const valor = unid === "R$" ? "R$ " + d.valor.toLocaleString("pt-BR") : unid === "%" ? d.valor + "%" : d.valor + " " + unid;
+          return [label, valor, meta + (unid === "%" ? "%" : ""), d.atingiu ? "OK" : "Abaixo"];
+        });
+        const ws = XLSX.utils.aoa_to_sheet([cab, ...linhas]);
+        ws["!cols"] = [{wch:25},{wch:15},{wch:15},{wch:10}];
+        XLSX.utils.book_append_sheet(wb, ws, "Indicadores");
+      }
+    }
+
+    // Aba Leads — todos os leads capturados
+    if (leads.length > 0) {
+      const cab = ["Data","Nome","Finalidade","Orcamento","Pagamento","Bairro","Prazo","WhatsApp","Email","Score","Temperatura"];
+      const linhas = leads.map(l => [
+        new Date(l.created_at).toLocaleString("pt-BR"),
+        l.nome, l.finalidade, l.orcamento, l.pagamento,
+        l.bairro, l.prazo, l.whatsapp, l.email, l.score, l.temperatura
+      ]);
+      const ws = XLSX.utils.aoa_to_sheet([cab, ...linhas]);
+      ws["!cols"] = [{wch:20},{wch:18},{wch:15},{wch:22},{wch:20},{wch:15},{wch:25},{wch:15},{wch:25},{wch:7},{wch:12}];
+      XLSX.utils.book_append_sheet(wb, ws, "Leads");
+    }
+
+    XLSX.writeFile(wb, "AlanDamasceno_Dados.xlsx");
+  });
 }
 
 function exportarPDF() {
   const element = document.querySelector(".wrap");
   const opt = {
-    margin: [10, 10],
+    margin: [8, 8],
     filename: "AlanDamasceno_Dashboard.pdf",
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, logging: false },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    image: { type: "jpeg", quality: 0.95 },
+    html2canvas: { scale: 2, useCORS: true, logging: false, width: element.scrollWidth, windowWidth: element.scrollWidth },
+    jsPDF: { unit: "mm", format: "a4", orientation: "landscape" }
   };
   html2pdf().set(opt).from(element).save();
 }
